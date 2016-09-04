@@ -19,7 +19,7 @@ endif
 
 LOCAL_SRC_FILES += ../libretro-test.c \
 						 ../vulkan_symbol_wrapper.c
-LOCAL_CFLAGS += -O2 -Wall -std=gnu99 -ffast-math -I..
+LOCAL_CFLAGS += -O2 -Wall -std=gnu99 -ffast-math -I.. -I../include
 
 include $(BUILD_SHARED_LIBRARY)
 
