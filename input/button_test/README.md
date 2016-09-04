@@ -1,5 +1,5 @@
 # buttontest
-A libretro core showing a graphic image of the Retropad gamepad. Pressing the buttons on the physical pad will
+A libretro core showing a graphic representation of the Retropad gamepad. Pressing the buttons on the physical pad will
 highlight the buttons onscreen.
 
 ## Programming language
