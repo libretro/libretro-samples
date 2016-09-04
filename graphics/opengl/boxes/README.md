@@ -25,8 +25,11 @@ Video
 ## Requirements
 A graphics card and driver supporting OpenGL 4.3 and/or higher.
 
+## Programming language
+C++11
+
 ## Building
-To compile, you will need a C compiler and assorted toolchain installed.
+To compile, you will need a C++11 compiler and assorted toolchain installed.
 
     make -f Makefile.libretro
 
