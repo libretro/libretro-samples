@@ -175,9 +175,8 @@ var
   left, top: integer;
   c: char;
 begin
-  for c in Text do
+  for c in upCase(Text) do
   begin
-    c := upCase(c);
     if (c > ' ') and (c < '`') then
     begin
       tx := x;
