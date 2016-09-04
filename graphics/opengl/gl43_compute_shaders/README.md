@@ -32,7 +32,7 @@ To compile, you will need a C++11 compiler and assorted toolchain installed.
 
     make
 
-This targets [libretro](http://libretro.com) GL interface, so you need [RetroArch](https://github.com/libretro/RetroArch) installed.
+This targets [libretro](http://libretro.com) GL interface, so you need a libretro frontend supporting this interface, such as [RetroArch](https://github.com/libretro/RetroArch), installed.
 
 ## Running
 After building, this command should run the program:
