@@ -1,7 +1,8 @@
-boxes
-=====
+gl43_compute_shaders
+====================
 
-OpenGL 4.3 experiment with compute shaders, and tons of instanced geometry! Targets [libretro](http://libretro.com) GL as a backend.
+This sample demonstrates a compute shader graphics demo using OpenGL 4.3. It uses tons of instanced geometry, and 
+targets [libretro](http://libretro.com) GL as a backend.
 
 Purpose of the compute shader is to do frustum culling, LOD-sorting and some simple physics for fun.
 
@@ -12,7 +13,7 @@ The LOD-sorting allows us to instance few but complex meshes when we're close,
 and progressively less and less detail per instance. Last LOD is just point sprites.
 
 The number of blocks in play is ~850k.
-With my nVidia GTX760, I can get roughly 300-500 FPS up to 1000 FPS depending on the scene complexity after culling.
+With an nVidia GTX760, performance is roughly 300-500 FPS up to 1000 FPS depending on the scene complexity after culling.
 
 LOD0: Blender monkey (Suzanne) (diffuse + specular lighting)<br/>
 LOD1: Cube (diffuse lighting)<br/>
