@@ -31,7 +31,7 @@ C++11
 ## Building
 To compile, you will need a C++11 compiler and assorted toolchain installed.
 
-    make -f Makefile
+    make
 
 This targets [libretro](http://libretro.com) GL interface, so you need [RetroArch](https://github.com/libretro/RetroArch) installed.
 
