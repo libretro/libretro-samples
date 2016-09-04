@@ -19,7 +19,7 @@ LOD2: Point sprites<br/>
 
 Video
 ======
-[YouTube](http://www.youtube.com/watch?v=_K2Wx7lW3fY&feature=youtu.be)
+[YouTube](https://www.youtube.com/watch?v=MMfvR252RR4)
 
 ## Requirements
 A graphics card driver supporting OpenGL 4.3 and/or higher.
