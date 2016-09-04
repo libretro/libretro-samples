@@ -1,4 +1,4 @@
-# rendering
+# vk_async_compute
 This sample demonstrates a raymarching graphics demo implemented in Vulkan through async compute.
 
 ## Requirements
