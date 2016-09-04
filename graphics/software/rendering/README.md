@@ -1,5 +1,5 @@
 # rendering
-This sample demonstrates how to render graphics to the software framebuffer. 
+This sample demonstrates how to render graphics to the software framebuffer using libretro API. 
 
 ## Programming language
 C
