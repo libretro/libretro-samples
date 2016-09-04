@@ -23,7 +23,7 @@ Video
 [YouTube](http://www.youtube.com/watch?v=_K2Wx7lW3fY&feature=youtu.be)
 
 ## Requirements
-A graphics card and driver supporting OpenGL 4.3 and/or higher.
+A graphics card driver supporting OpenGL 4.3 and/or higher.
 
 ## Programming language
 C++11

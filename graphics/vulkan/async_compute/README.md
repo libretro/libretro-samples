@@ -1,6 +1,9 @@
 # rendering
 This sample demonstrates a raymarching graphics demo implemented in Vulkan through async compute.
 
+## Requirements
+A graphics card driver supporting Vulkan API.
+
 ## Programming language
 C
 
