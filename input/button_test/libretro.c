@@ -5,9 +5,24 @@
 #include <string.h>
 #include <math.h>
 
-#include "retro_miscellaneous.h"
+#if defined(__CELLOS_LV2__) && !defined(__PSL1GHT__)
+#include <sys/timer.h>
+#elif defined(XENON)
+#include <time/time.h>
+#elif defined(GEKKO) || defined(__PSL1GHT__) || defined(__QNX__)
+#include <unistd.h>
+#elif defined(PSP)
+#include <pspthreadman.h> 
+#elif defined(VITA)
+#include <psp2/kernel/threadmgr.h>
+#elif defined(_3DS)
+#include <3ds.h>
+#else
+#include <time.h>
+#endif
 
 #include "libretro.h"
+#include "remotepad.h"
 
 #ifdef RARCH_INTERNAL
 #include "internal_cores.h"
@@ -15,8 +30,6 @@
 #else
 #define NETRETROPAD_CORE_PREFIX(s) s
 #endif
-
-#include "remotepad.h"
 
 #define DESC_NUM_PORTS(desc) ((desc)->port_max - (desc)->port_min + 1)
 #define DESC_NUM_INDICES(desc) ((desc)->index_max - (desc)->index_min + 1)
@@ -27,6 +40,46 @@
    index * ((desc)->id_max - (desc)->id_min + 1) + \
    id \
 )
+
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+
+#if defined(_WIN32) || defined(__INTEL_COMPILER)
+#define INLINE __inline
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__>=199901L
+#define INLINE inline
+#elif defined(__GNUC__)
+#define INLINE __inline__
+#else
+#define INLINE
+#endif
+
+/**
+ * retro_sleep:
+ * @msec         : amount in milliseconds to sleep
+ *
+ * Sleeps for a specified amount of milliseconds (@msec).
+ **/
+static INLINE void retro_sleep(unsigned msec)
+{
+#if defined(__CELLOS_LV2__) && !defined(__PSL1GHT__)
+   sys_timer_usleep(1000 * msec);
+#elif defined(PSP) || defined(VITA)
+   sceKernelDelayThread(1000 * msec);
+#elif defined(_3DS)
+   svcSleepThread(1000000 * (s64)msec);
+#elif defined(_WIN32)
+   Sleep(msec);
+#elif defined(XENON)
+   udelay(1000 * msec);
+#elif defined(GEKKO) || defined(__PSL1GHT__) || defined(__QNX__)
+   usleep(1000 * msec);
+#else
+   struct timespec tv = {0};
+   tv.tv_sec = msec / 1000;
+   tv.tv_nsec = (msec % 1000) * 1000000;
+   nanosleep(&tv, NULL);
+#endif
+}
 
 struct descriptor {
    int device;
