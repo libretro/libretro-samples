@@ -1,5 +1,5 @@
-# libretro_test_gl
-This sample demonstrates a libretro core using OpenGL. It works on both desktop (OpenGL 2.0 and later) and mobile (OpenGL ES 2.0 and later)
+# libretro_test_gl_shaders
+This sample demonstrates a libretro core using programmable pipeline OpenGL (GL 2.0 and later / OpenGL ES 2.0). It works on both desktop (OpenGL 2.0 and later) and mobile (OpenGL ES 2.0 and later)
 
 ## Requirements
 On the desktop - A graphics card driver supporting OpenGL 2.0 and/or higher.

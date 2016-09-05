@@ -1,4 +1,4 @@
-# gl43_compute_shaders
+# libretro_test_gl_compute_shaders
 This sample demonstrates a compute shader graphics demo using OpenGL 4.3. It uses tons of instanced geometry, and 
 targets [libretro](http://libretro.com) GL as a backend.
 
