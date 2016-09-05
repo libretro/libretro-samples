@@ -6,7 +6,6 @@
 
 #include "vulkan/vulkan_symbol_wrapper.h"
 #include "libretro_vulkan.h"
-#include "retro_miscellaneous.h"
 
 static struct retro_hw_render_callback hw_render;
 static const struct retro_hw_render_interface_vulkan *vulkan;
