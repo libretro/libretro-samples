@@ -5,8 +5,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "retro_miscellaneous.h"
-
 #include "libretro.h"
 
 static uint32_t *frame_buf;
