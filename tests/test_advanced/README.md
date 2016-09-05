@@ -1,4 +1,4 @@
-# libretro_advanced_test
+# libretro_test_advanced
 An advanced test core written in C for libretro.
 
 This core has a group of tests which you can cycle between by pressing the
