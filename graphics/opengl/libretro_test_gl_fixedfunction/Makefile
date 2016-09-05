@@ -135,7 +135,7 @@ else
 	CFLAGS += -std=gnu99
 endif
 
-OBJECTS := libretro_gl_ff_test.o ../../libretro-common/glsym/rglgen.o
+OBJECTS := libretro_gl_ff_test.o glsym/rglgen.o
 CFLAGS += -Wall -pedantic $(fpic)
 
 ifeq ($(GLES), 1)
@@ -146,9 +146,9 @@ ifeq ($(GLES), 1)
       CFLAGS += -DHAVE_OPENGLES3
    endif
    LIBS += -lGLESv2 # Still link against GLESv2 when using GLES3 API, at least on desktop Linux.
-   OBJECTS += ../../libretro-common/glsym/glsym_es2.o
+   OBJECTS += glsym/glsym_es2.o
 else
-   OBJECTS += ../../libretro-common/glsym/glsym_gl.o
+   OBJECTS += glsym/glsym_gl.o
    LIBS += $(GL_LIB)
 endif
 
@@ -162,7 +162,7 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(fpic) $(SHARED) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS) -lm $(EXTRA_GL_LIBS)
 
 %.o: %.c
-	$(CC) -I../../libretro-common/include $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -f $(OBJECTS) $(TARGET)
