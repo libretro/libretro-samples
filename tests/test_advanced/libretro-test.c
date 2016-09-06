@@ -1,29 +1,7 @@
-/* 1. Video output
- * 1a. Tearing test, horizontal: Vertical lines moving horizontally.
- * 1b. Tearing test, vertical: Horizontal lines moving vertically.
- * 1c. vsync test: Flickers between white and black each frame.
- * 1d. Stretching test: A checkerboard of black and white, to test if each 
- *     square looks smooth.
- * 1e. Border test: A white screen, with red and yellow borders.
- * 2. Latency and synchronization
- * 2a. A/V sync test. Will switch between white and silent, and black and 
- *     noisy, every two seconds.
- * 2b. Latency test. If any of ABXYLRStSe are held, it's black and noisy; 
- *     if not, it's white and silent.
- * 3. Input
- * 3a. Press any key to check how fast input_state_cb can be called.
- * 4. Netplay
- * 4a. Input sync. All button presses are sent to the screen; a hash of that 
- * is used as background color, for easy comparison.
- *
- * Up and Down will cycle between the test groups. Left and Right will cycle 
- * between the tests in each group.
- */
-
 static int numgroups=4;
 static int groupsizes[]={5,2,1,1};
 
-#define init_grp 3
+#define init_grp 1
 #define init_sub 'a'
 
 /* Also tests the following libretro env callbacks: */
@@ -35,14 +13,8 @@ static int groupsizes[]={5,2,1,1};
 //#define PIXFMT 1//RETRO_PIXEL_FORMAT_XRGB8888
 #define PIXFMT 2//RETRO_PIXEL_FORMAT_RGB565
 
-/* For XRGB8888, 1a will set the Xs to 0, while 1b will set them to 1.
- * Note that test 3a will give different colors for each of the pixel formats. 
- * Therefore, for any comparison to be meaningful, the pixel format must be the same.
-
- * Enable to lock up for two seconds and repeatedly call retro_input_state for 
+/* Enable to lock up for two seconds and repeatedly call retro_input_state for 
  * random buttons. Print how many iterations were done.
- * Unix-likes only because I'm too lazy to mess with GetSystemTimeAsFileTime. 
- * That, and it's slow.
  */
 #define TEST_INPUT_SPEED
 
@@ -270,7 +242,7 @@ static void test3a(void)
       uint64_t n=0;
       while (cpu_features_get_time_usec() < end)
       {
-         for (int i=0;i<32;i++)
+         for (i=0;i<32;i++)
          {
             input_state_cb(rand()%2,
                   RETRO_DEVICE_JOYPAD, 0, rand()%16);
@@ -483,12 +455,12 @@ void retro_run(void)
    if (sound_enable)
    {
       int16_t data[8*64*2];
-      for (int i=0;i<8*64;i++)
+      for (i=0;i<8*64;i++)
       {
          data[i*2]=sin(((double)(state.frame*8*64 + i))/30720*2*PI * 440)*4096;
          data[i*2+1]=data[i*2];
       }
-      for (int i=0;i<8;i++)
+      for (i=0;i<8;i++)
       {
          audio_batch_cb(data+(i*128), 64);
       }
@@ -497,7 +469,7 @@ void retro_run(void)
    {
       int16_t data[64*2];
       memset(data, 0, sizeof(data));
-      for (int i=0;i<8;i++) audio_batch_cb(data, 64);
+      for (i=0;i<8;i++) audio_batch_cb(data, 64);
    }
    
    video_cb(pixels, 320, 240, sizeof(pixel_t)*320);
