@@ -116,7 +116,7 @@ unsigned long crc32_calc(unsigned char *ptr, unsigned cnt, unsigned long crc);
 
 #if defined(__unix__)
 #include <time.h>
-uint64_t window_get_time()
+uint64_t cpu_features_get_time_usec()
 {
    struct timespec ts;
    clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -125,7 +125,7 @@ uint64_t window_get_time()
 
 #elif defined(_WIN32)
 #include <windows.h>
-uint64_t window_get_time()
+uint64_t cpu_features_get_time_usec()
 {
    static LARGE_INTEGER freq = {};
    if (!freq.QuadPart) QueryPerformanceFrequency(&freq);
@@ -135,7 +135,7 @@ uint64_t window_get_time()
    return count.QuadPart * 1000000 / freq.QuadPart;
 }
 #else
-uint64_t window_get_time()
+uint64_t cpu_features_get_time_usec()
 {
    static uint64_t last = 0;
    last += 1000000;
@@ -266,9 +266,9 @@ static void test3a(void)
    unsigned i;
    if (state.test3a_activate==1)
    {
-      uint64_t end=window_get_time()+2000000;
+      uint64_t end=cpu_features_get_time_usec()+2000000;
       uint64_t n=0;
-      while (window_get_time() < end)
+      while (cpu_features_get_time_usec() < end)
       {
          for (int i=0;i<32;i++)
          {
