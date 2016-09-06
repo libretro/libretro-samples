@@ -262,19 +262,19 @@ static void test3a(void)
       pixels[i]=p_wht;
    
    if (state.test3a_activate==1)
-      renderstr(p_blk, "Running...", 8, 8);
+      renderstr(p_blk, "Running...", 8, 16);
    else if (state.test3a_last==0)
-      renderstr(p_blk, "Ready", 8, 8);
+      renderstr(p_blk, "Ready", 8, 16);
    else
    {
       char line[128];
       formatnum(line, state.test3a_last);
       strcat(line, " calls per second");
-      renderstr(p_blk, line, 8, 8);
+      renderstr(p_blk, line, 8, 16);
       
       formatnum(line, state.test3a_last/60);
       strcat(line, " calls per frame");
-      renderstr(p_blk, line, 8, 16);
+      renderstr(p_blk, line, 8, 24);
    }
 }
 
@@ -372,12 +372,14 @@ void retro_run(void)
    bool canchange;
    unsigned i;
 
+   char testid[3];
+
    poller_cb();
    canchange=((inpstate[0]&0x00F0)==0);
    inpstate[0] = 0x0000;
    inpstate[1] = 0x0000;
 
-   for (i=0;i<16;i++) /* it only goes to 12, but a pile of zeroes is harmless. */
+   for (i=0;i<16;i++)
    {
       inpstate[0]|=(input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i))<<i;
       inpstate[1]|=(input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, i))<<i;
@@ -449,6 +451,20 @@ void retro_run(void)
       if (state.testsub=='a')
          test4a();
    }
+   
+   testid[0] = '0'+state.testgroup;
+   testid[1] = state.testsub;
+   testid[2] = '\0';
+   
+   renderstr(p_wht, testid, 7, 7);
+   renderstr(p_wht, testid, 8, 7);
+   renderstr(p_wht, testid, 9, 7);
+   renderstr(p_wht, testid, 7, 8);
+   renderstr(p_wht, testid, 9, 8);
+   renderstr(p_wht, testid, 7, 9);
+   renderstr(p_wht, testid, 8, 9);
+   renderstr(p_wht, testid, 9, 9);
+   renderstr(p_blk, testid, 8, 8);
    
    state.frame++;
    
