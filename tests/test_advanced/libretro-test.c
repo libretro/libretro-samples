@@ -112,35 +112,34 @@ pixel_t pixels[240*320];
 
 void renderchr(pixel_t col, int chr, int x, int y);
 void renderstr(pixel_t col, const char * str, int x, int y);
-unsigned long crc32_calc (unsigned char *ptr, unsigned cnt, unsigned long crc);
+unsigned long crc32_calc(unsigned char *ptr, unsigned cnt, unsigned long crc);
 
 #if defined(__unix__)
 #include <time.h>
 uint64_t window_get_time()
 {
-	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	return ts.tv_sec*1000000 + ts.tv_nsec/1000;
+   struct timespec ts;
+   clock_gettime(CLOCK_MONOTONIC, &ts);
+   return ts.tv_sec*1000000 + ts.tv_nsec/1000;
 }
 
 #elif defined(_WIN32)
 #include <windows.h>
 uint64_t window_get_time()
 {
-	static LARGE_INTEGER freq = {};
-	if (!freq.QuadPart) QueryPerformanceFrequency(&freq);
-	LARGE_INTEGER count;
-	QueryPerformanceCounter(&count);
-	
-	return count.QuadPart * 1000000 / freq.QuadPart;
-	
+   static LARGE_INTEGER freq = {};
+   if (!freq.QuadPart) QueryPerformanceFrequency(&freq);
+   LARGE_INTEGER count;
+   QueryPerformanceCounter(&count);
+   
+   return count.QuadPart * 1000000 / freq.QuadPart;
 }
 #else
 uint64_t window_get_time()
 {
-	static uint64_t last = 0;
-	last += 1000000;
-	return last;
+   static uint64_t last = 0;
+   last += 1000000;
+   return last;
 }
 #endif
 
@@ -148,42 +147,42 @@ static void test1a(void)
 {
    unsigned x, y;
 
-	for (x=0;x<320;x++)
-	{
-		if ((x+state.frame)%40 > 20)
+   for (x=0;x<320;x++)
+   {
+      if ((x+state.frame)%40 > 20)
          pixels[x]=p_blk;
-		else
+      else
          pixels[x]=p_wht;
-	}
+   }
 
-	for (y=1;y<240;y++)
+   for (y=1;y<240;y++)
       memcpy(pixels+(320*y), pixels+0, sizeof(*pixels)*320);
 }
 
 static void test1b(void)
 {
    unsigned p;
-	for (p=0;p<320*240;p++)
-	{
-		if ((p+state.frame)%30 > 15)
+   for (p=0;p<320*240;p++)
+   {
+      if ((p+state.frame)%30 > 15)
          pixels[p]=p_blk|p_x;
-		else
+      else
          pixels[p]=p_wht|p_x;
-	}
+   }
 }
 
 static void test1c(void)
 {
-	if (state.frame&1)
+   if (state.frame&1)
       memset(pixels, 0xFF, sizeof(pixels));
-	else
+   else
       memset(pixels, 0x00, sizeof(pixels));
 }
 
 static void test1d(void)
 {
    unsigned x, y;
-	for (y=0;y<240;y++)
+   for (y=0;y<240;y++)
    {
       for (x=0;x<320;x++)
       {
@@ -198,113 +197,113 @@ static void test1d(void)
 static void test1e(void)
 {
    unsigned x, y;
-	memset(pixels, 0xFF, sizeof(pixels));
+   memset(pixels, 0xFF, sizeof(pixels));
 
-	for (x=0;x<320;x++)
-	{
-		pixels[         x]=((x&1)?p_red:p_yel);
-		pixels[239*320+x]=((x&1)?p_yel:p_red);
-	}
+   for (x=0;x<320;x++)
+   {
+      pixels[         x]=((x&1)?p_red:p_yel);
+      pixels[239*320+x]=((x&1)?p_yel:p_red);
+   }
 
-	for (y=0;y<240;y++)
-	{
-		pixels[y*320+  0]=((y&1)?p_red:p_yel);
-		pixels[y*320+319]=((y&1)?p_yel:p_red);
-	}
+   for (y=0;y<240;y++)
+   {
+      pixels[y*320+  0]=((y&1)?p_red:p_yel);
+      pixels[y*320+319]=((y&1)?p_yel:p_red);
+   }
 }
 
 static void test2a(void)
 {
-	if (state.frame%240 >= 120)
-	{
-		memset(pixels, 0x00, sizeof(pixels));
-		memset(pixels+(320*(state.frame%120)*2), 0xFF, sizeof(*pixels)*2);
-		sound_enable=true;
-	}
-	else
-	{
-		memset(pixels, 0xFF, sizeof(pixels));
-		memset(pixels+(320*(state.frame%120)*2), 0x00, sizeof(*pixels)*2);
-		sound_enable=false;
-	}
+   if (state.frame%240 >= 120)
+   {
+      memset(pixels, 0x00, sizeof(pixels));
+      memset(pixels+(320*(state.frame%120)*2), 0xFF, sizeof(*pixels)*2);
+      sound_enable=true;
+   }
+   else
+   {
+      memset(pixels, 0xFF, sizeof(pixels));
+      memset(pixels+(320*(state.frame%120)*2), 0x00, sizeof(*pixels)*2);
+      sound_enable=false;
+   }
 }
 
 static void test2b(void)
 {
-	if (inpstate[0]&0x0F0F)
-	{
-		memset(pixels, 0x00, sizeof(pixels));
-		sound_enable=true;
-	}
-	else
-	{
-		memset(pixels, 0xFF, sizeof(pixels));
-		sound_enable=false;
-	}
+   if (inpstate[0]&0x0F0F)
+   {
+      memset(pixels, 0x00, sizeof(pixels));
+      sound_enable=true;
+   }
+   else
+   {
+      memset(pixels, 0xFF, sizeof(pixels));
+      sound_enable=false;
+   }
 }
 
 static void formatnum(char* out, unsigned int in)
 {
-	char tmp[16];
-	int pos=0;
+   char tmp[16];
+   int pos=0;
 
-	sprintf(tmp, "%.10u", in);
+   sprintf(tmp, "%.10u", in);
 
-	while (tmp[pos]=='0')
+   while (tmp[pos]=='0')
       pos++;
    *out++=tmp[pos++];
 
-	while (tmp[pos])
-	{
-		if (pos%3 == 1) *out++=',';
-		*out++=tmp[pos++];
-	}
-	*out='\0';
+   while (tmp[pos])
+   {
+      if (pos%3 == 1) *out++=',';
+      *out++=tmp[pos++];
+   }
+   *out='\0';
 }
 
 static void test3a(void)
 {
    unsigned i;
-	if (state.test3a_activate==1)
-	{
-		uint64_t end=window_get_time()+2000000;
-		uint64_t n=0;
-		while (window_get_time() < end)
-		{
-			for (int i=0;i<32;i++)
-			{
-				input_state_cb(rand()%2,
+   if (state.test3a_activate==1)
+   {
+      uint64_t end=window_get_time()+2000000;
+      uint64_t n=0;
+      while (window_get_time() < end)
+      {
+         for (int i=0;i<32;i++)
+         {
+            input_state_cb(rand()%2,
                   RETRO_DEVICE_JOYPAD, 0, rand()%16);
-				n++;
-			}
-		}
-		state.test3a_last=n/2;
-		state.test3a_activate=2;
-	}
-	
-	if (state.test3a_activate==0 && inpstate[0]&0xFF0F)
+            n++;
+         }
+      }
+      state.test3a_last=n/2;
+      state.test3a_activate=2;
+   }
+   
+   if (state.test3a_activate==0 && inpstate[0]&0xFF0F)
       state.test3a_activate=1;
-	if (state.test3a_activate==2 && !inpstate[0])
+   if (state.test3a_activate==2 && !inpstate[0])
       state.test3a_activate=0;
-	
-	for (i=0;i<320*240;i++)
+   
+   for (i=0;i<320*240;i++)
       pixels[i]=p_wht;
-	
-	if (state.test3a_activate==1)
+   
+   if (state.test3a_activate==1)
       renderstr(p_blk, "Running...", 8, 8);
-	else if (state.test3a_last==0)
+   else if (state.test3a_last==0)
       renderstr(p_blk, "Ready", 8, 8);
-	else
-	{
-		char line[128];
-		formatnum(line, state.test3a_last);
-		strcat(line, " calls per second");
-		renderstr(p_blk, line, 8, 8);
-		
-		formatnum(line, state.test3a_last/60);
-		strcat(line, " calls per frame");
-		renderstr(p_blk, line, 8, 16);
-	}
+   else
+   {
+      char line[128];
+      formatnum(line, state.test3a_last);
+      strcat(line, " calls per second");
+      renderstr(p_blk, line, 8, 8);
+      
+      formatnum(line, state.test3a_last/60);
+      strcat(line, " calls per frame");
+      renderstr(p_blk, line, 8, 16);
+   }
 }
 
 static void test4a(void)
@@ -312,30 +311,30 @@ static void test4a(void)
    uint16_t color;
    unsigned i;
 
-	if (inpstate[0]!=state.test4a[27*3+1] || inpstate[1]!=state.test4a[27*3+2])
-	{
-		for (i=0;i<27*3;i++)
-			state.test4a[0*3+i]=state.test4a[0*3+i+3];
+   if (inpstate[0]!=state.test4a[27*3+1] || inpstate[1]!=state.test4a[27*3+2])
+   {
+      for (i=0;i<27*3;i++)
+         state.test4a[0*3+i]=state.test4a[0*3+i+3];
 
-		state.test4a[27*3+0]=state.frame;
-		state.test4a[27*3+1]=inpstate[0];
-		state.test4a[27*3+2]=inpstate[1];
-	}
-	
-	color=(~crc32_calc((unsigned char*)state.test4a, 6*28, ~0U))&p_dark;
+      state.test4a[27*3+0]=state.frame;
+      state.test4a[27*3+1]=inpstate[0];
+      state.test4a[27*3+2]=inpstate[1];
+   }
+   
+   color=(~crc32_calc((unsigned char*)state.test4a, 6*28, ~0U))&p_dark;
 
-	for (i=0;i<320*240;i++)
+   for (i=0;i<320*240;i++)
       pixels[i]=color;
-	
-	for (i=0;i<28;i++)
-	{
-		if (state.test4a[i*3+0])
-		{
-			char line[17];
-			sprintf(line, "%i: %.4X %.4X", state.test4a[i*3+0], state.test4a[i*3+1], state.test4a[i*3+2]);
-			renderstr(p_wht, line, 8, 8+i*8);
-		}
-	}
+   
+   for (i=0;i<28;i++)
+   {
+      if (state.test4a[i*3+0])
+      {
+         char line[17];
+         sprintf(line, "%i: %.4X %.4X", state.test4a[i*3+0], state.test4a[i*3+1], state.test4a[i*3+2]);
+         renderstr(p_wht, line, 8, 8+i*8);
+      }
+   }
 }
 
 #ifndef EXTERNC
@@ -364,27 +363,27 @@ EXPORT void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb;
 
 EXPORT void retro_set_environment(retro_environment_t cb)
 {
-	environ_cb=cb;
-	
-	bool True=true;
-	environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &True);
-	
+   environ_cb=cb;
+   
+   bool True=true;
+   environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &True);
+   
 #if 0
-	environ_cb(RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK, &frametime_g);
-	environ_cb(RETRO_ENVIRONMENT_GET_PERF_INTERFACE, &perf);
+   environ_cb(RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK, &frametime_g);
+   environ_cb(RETRO_ENVIRONMENT_GET_PERF_INTERFACE, &perf);
 #endif
 }
 
 EXPORT void retro_init(void)
 {
-	struct retro_log_callback log;
-	if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
-		log_cb = log.log;
-	else
-		log_cb = log_null;
-	
-	log_cb(RETRO_LOG_DEBUG, "0123 test");
-	log_cb(RETRO_LOG_DEBUG, "%.3i%c t%st", 12, '3', "es");
+   struct retro_log_callback log;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
+      log_cb = log.log;
+   else
+      log_cb = log_null;
+   
+   log_cb(RETRO_LOG_DEBUG, "0123 test");
+   log_cb(RETRO_LOG_DEBUG, "%.3i%c t%st", 12, '3', "es");
 }
 
 EXPORT void retro_deinit(void) {}
@@ -392,26 +391,26 @@ EXPORT unsigned retro_api_version(void) { return RETRO_API_VERSION; }
 
 EXPORT void retro_get_system_info(struct retro_system_info *info)
 {
-	const struct retro_system_info myinfo={ "minir test core", "v1.00", "c|h", false, false };
-	memcpy(info, &myinfo, sizeof(myinfo));
+   const struct retro_system_info myinfo={ "minir test core", "v1.00", "c|h", false, false };
+   memcpy(info, &myinfo, sizeof(myinfo));
 }
 
 EXPORT void retro_get_system_av_info(struct retro_system_av_info* info)
 {
-	const struct retro_system_av_info myinfo={
-		{ 320, 240, 320, 240, 0.0 },
-		{ 60.0, 30720.0 }
-	};
-	memcpy(info, &myinfo, sizeof(myinfo));
+   const struct retro_system_av_info myinfo={
+      { 320, 240, 320, 240, 0.0 },
+      { 60.0, 30720.0 }
+   };
+   memcpy(info, &myinfo, sizeof(myinfo));
 }
 
 EXPORT void retro_set_controller_port_device(unsigned port, unsigned device) {}
 
 EXPORT void retro_reset(void)
 {
-	memset(&state, 0, sizeof(state));
-	state.testgroup=init_grp;
-	state.testsub=init_sub;
+   memset(&state, 0, sizeof(state));
+   state.testgroup=init_grp;
+   state.testsub=init_sub;
 }
 
 EXPORT void retro_run(void)
@@ -419,132 +418,132 @@ EXPORT void retro_run(void)
    bool canchange;
    unsigned i;
 
-	poller_cb();
-	canchange=((inpstate[0]&0x00F0)==0);
-	inpstate[0] = 0x0000;
-	inpstate[1] = 0x0000;
+   poller_cb();
+   canchange=((inpstate[0]&0x00F0)==0);
+   inpstate[0] = 0x0000;
+   inpstate[1] = 0x0000;
 
-	for (i=0;i<16;i++) /* it only goes to 12, but a pile of zeroes is harmless. */
-	{
-		inpstate[0]|=(input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i))<<i;
-		inpstate[1]|=(input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, i))<<i;
-	}
-	sound_enable=false;
-	
-	if (canchange)
-	{
-		bool changed=false;
-		if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_UP))
-		{
-			state.testgroup--;
-			if (state.testgroup==0) state.testgroup=numgroups;
-			state.testsub='a';
-			changed=true;
-		}
-		if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
-		{
-			state.testgroup++;
-			if (state.testgroup-1==numgroups) state.testgroup=1;
-			state.testsub='a';
-			changed=true;
-		}
-		if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_LEFT))
-		{
-			state.testsub--;
-			if (state.testsub=='a'-1) state.testsub=groupsizes[state.testgroup-1]+'a'-1;
-			changed=true;
-		}
-		if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_RIGHT))
-		{
-			state.testsub++;
-			if (state.testsub-1==groupsizes[state.testgroup-1]+'a'-1) state.testsub='a';
-			changed=true;
-		}
-		if (changed)
-		{
-			state.frame=0;
-		}
-	}
-	
-	if (state.testgroup==1)
-	{
-		if (state.testsub=='a')
+   for (i=0;i<16;i++) /* it only goes to 12, but a pile of zeroes is harmless. */
+   {
+      inpstate[0]|=(input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i))<<i;
+      inpstate[1]|=(input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, i))<<i;
+   }
+   sound_enable=false;
+   
+   if (canchange)
+   {
+      bool changed=false;
+      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_UP))
+      {
+         state.testgroup--;
+         if (state.testgroup==0) state.testgroup=numgroups;
+         state.testsub='a';
+         changed=true;
+      }
+      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
+      {
+         state.testgroup++;
+         if (state.testgroup-1==numgroups) state.testgroup=1;
+         state.testsub='a';
+         changed=true;
+      }
+      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_LEFT))
+      {
+         state.testsub--;
+         if (state.testsub=='a'-1) state.testsub=groupsizes[state.testgroup-1]+'a'-1;
+         changed=true;
+      }
+      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_RIGHT))
+      {
+         state.testsub++;
+         if (state.testsub-1==groupsizes[state.testgroup-1]+'a'-1) state.testsub='a';
+         changed=true;
+      }
+      if (changed)
+      {
+         state.frame=0;
+      }
+   }
+   
+   if (state.testgroup==1)
+   {
+      if (state.testsub=='a')
          test1a();
-		if (state.testsub=='b')
+      if (state.testsub=='b')
          test1b();
-		if (state.testsub=='c')
+      if (state.testsub=='c')
          test1c();
-		if (state.testsub=='d')
+      if (state.testsub=='d')
          test1d();
-		if (state.testsub=='e')
+      if (state.testsub=='e')
          test1e();
-	}
-	if (state.testgroup==2)
-	{
-		if (state.testsub=='a')
+   }
+   if (state.testgroup==2)
+   {
+      if (state.testsub=='a')
          test2a();
-		if (state.testsub=='b')
+      if (state.testsub=='b')
          test2b();
-	}
-	if (state.testgroup==3)
-	{
-		if (state.testsub=='a')
+   }
+   if (state.testgroup==3)
+   {
+      if (state.testsub=='a')
          test3a();
-	}
-	if (state.testgroup==4)
-	{
-		if (state.testsub=='a')
+   }
+   if (state.testgroup==4)
+   {
+      if (state.testsub=='a')
          test4a();
-	}
-	
-	state.frame++;
-	
-	if (sound_enable)
-	{
-		int16_t data[8*64*2];
-		for (int i=0;i<8*64;i++)
-		{
-			data[i*2]=sin(((double)(state.frame*8*64 + i))/30720*2*PI * 440)*4096;
-			data[i*2+1]=data[i*2];
-		}
-		for (int i=0;i<8;i++)
-		{
-			audio_batch_cb(data+(i*128), 64);
-		}
-	}
-	else
-	{
-		int16_t data[64*2];
-		memset(data, 0, sizeof(data));
-		for (int i=0;i<8;i++) audio_batch_cb(data, 64);
-	}
-	
-	video_cb(pixels, 320, 240, sizeof(pixel_t)*320);
+   }
+   
+   state.frame++;
+   
+   if (sound_enable)
+   {
+      int16_t data[8*64*2];
+      for (int i=0;i<8*64;i++)
+      {
+         data[i*2]=sin(((double)(state.frame*8*64 + i))/30720*2*PI * 440)*4096;
+         data[i*2+1]=data[i*2];
+      }
+      for (int i=0;i<8;i++)
+      {
+         audio_batch_cb(data+(i*128), 64);
+      }
+   }
+   else
+   {
+      int16_t data[64*2];
+      memset(data, 0, sizeof(data));
+      for (int i=0;i<8;i++) audio_batch_cb(data, 64);
+   }
+   
+   video_cb(pixels, 320, 240, sizeof(pixel_t)*320);
 }
 
 EXPORT size_t retro_serialize_size(void) { return sizeof(state); }
 EXPORT bool retro_serialize(void* data, size_t size)
 {
-	if (size<sizeof(state)) return false;
-	memcpy(data, &state, sizeof(state));
-	return true;
+   if (size<sizeof(state)) return false;
+   memcpy(data, &state, sizeof(state));
+   return true;
 }
 EXPORT bool retro_unserialize(const void* data, size_t size)
 {
-	if (size<sizeof(state)) return false;
-	memcpy(&state, data, sizeof(state));
-	state.frame++;
-	return true;
+   if (size<sizeof(state)) return false;
+   memcpy(&state, data, sizeof(state));
+   state.frame++;
+   return true;
 }
 
 EXPORT void retro_cheat_reset(void) {}
 EXPORT void retro_cheat_set(unsigned index, bool enabled, const char* code) {}
 EXPORT bool retro_load_game(const struct retro_game_info* game)
 {
-	retro_reset();
-	enum retro_pixel_format rgb565=(enum retro_pixel_format)PIXFMT;
-	if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb565)) return false;
-	return true;
+   retro_reset();
+   enum retro_pixel_format rgb565=(enum retro_pixel_format)PIXFMT;
+   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb565)) return false;
+   return true;
 }
 EXPORT bool retro_load_game_special(unsigned game_type, const struct retro_game_info* info, size_t num_info) { return false; }
 EXPORT void retro_unload_game(void) {}
@@ -598,10 +597,10 @@ unsigned char convtable[256]={
 
 void renderchr(pixel_t col, int chr, int x, int y)
 {
-	int ix;
-	int iy;
-	
-	for (iy=0;iy<5;iy++)
+   int ix;
+   int iy;
+   
+   for (iy=0;iy<5;iy++)
    {
       for (ix=0;ix<8;ix++)
       {
@@ -613,9 +612,9 @@ void renderchr(pixel_t col, int chr, int x, int y)
 
 void renderstr(pixel_t col, const char * str, int x, int y)
 {
-	int i;
-	for (i=0;str[i];i++)
-		renderchr(col, str[i], x+i*8, y);
+   int i;
+   for (i=0;str[i];i++)
+      renderchr(col, str[i], x+i*8, y);
 }
 
 /* Karl Malbrain's compact CRC-32.
