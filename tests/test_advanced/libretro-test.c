@@ -9,36 +9,31 @@ static int groupsizes[]={5,2,1,1};
 //RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME 18
 
 //do not use the names as primary - they're an enum, the preprocessor can't read them
-//#define PIXFMT 0//RETRO_PIXEL_FORMAT_0RGB1555
+#define PIXFMT 0//RETRO_PIXEL_FORMAT_0RGB1555
 //#define PIXFMT 1//RETRO_PIXEL_FORMAT_XRGB8888
-#define PIXFMT 2//RETRO_PIXEL_FORMAT_RGB565
-
-/* Enable to lock up for two seconds and repeatedly call retro_input_state for 
- * random buttons. Print how many iterations were done.
- */
-#define TEST_INPUT_SPEED
+//#define PIXFMT 2//RETRO_PIXEL_FORMAT_RGB565
 
 #if PIXFMT==0
 #define pixel_t uint16_t
-#define p_red 0x001F
+#define p_red 0x7C00
 #define p_grn 0x03E0
-#define p_blu 0x7C00
+#define p_blu 0x001F
 #define p_x 0
 #define p_dark 0x3DEF
 #endif
 #if PIXFMT==1
 #define pixel_t uint32_t
-#define p_red 0x0000FF
+#define p_red 0xFF0000
 #define p_grn 0x00FF00
-#define p_blu 0xFF0000
+#define p_blu 0x0000FF
 #define p_x 0xFF000000
 #define p_dark 0x7F7F7F
 #endif
 #if PIXFMT==2
 #define pixel_t uint16_t
-#define p_red 0x001F
+#define p_red 0xF800
 #define p_grn 0x07E0
-#define p_blu 0xF800
+#define p_blu 0x001F
 #define p_x 0
 #define p_dark 0x7BEF
 #endif
@@ -145,10 +140,17 @@ static void test1b(void)
 
 static void test1c(void)
 {
+   int i;
    if (state.frame&1)
-      memset(pixels, 0xFF, sizeof(pixels));
+   {
+      for (i=0;i<320*240;i++)
+         pixels[i] = p_wht;
+   }
    else
-      memset(pixels, 0x00, sizeof(pixels));
+   {
+      for (i=0;i<320*240;i++)
+         pixels[i] = p_blk;
+   }
 }
 
 static void test1d(void)
@@ -169,11 +171,14 @@ static void test1d(void)
 static void test1e(void)
 {
    unsigned x, y;
-   memset(pixels, 0xFF, sizeof(pixels));
+   for (x=0;x<320*240;x++)
+   {
+      pixels[x] = p_wht;
+   }
 
    for (x=0;x<320;x++)
    {
-      pixels[         x]=((x&1)?p_red:p_yel);
+      pixels[        x]=((x&1)?p_red:p_yel);
       pixels[239*320+x]=((x&1)?p_yel:p_red);
    }
 
