@@ -337,31 +337,13 @@ static void test4a(void)
    }
 }
 
-#ifndef EXTERNC
- #ifdef __cplusplus
-  #define EXTERNC extern "C"
- #else
-  #define EXTERNC
- #endif
-#endif
+void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
+void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
+void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
+void retro_set_input_poll(retro_input_poll_t cb) { poller_cb = cb; }
+void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
-#ifndef EXPORT
- #if defined(CPPCLI)
-  #define EXPORT EXTERNC
- #elif defined(_WIN32)
-  #define EXPORT EXTERNC __declspec(dllexport)
- #else
-  #define EXPORT EXTERNC __attribute__((visibility("default")))
- #endif
-#endif
-
-EXPORT void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
-EXPORT void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
-EXPORT void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
-EXPORT void retro_set_input_poll(retro_input_poll_t cb) { poller_cb = cb; }
-EXPORT void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
-
-EXPORT void retro_set_environment(retro_environment_t cb)
+void retro_set_environment(retro_environment_t cb)
 {
    environ_cb=cb;
    
@@ -374,7 +356,7 @@ EXPORT void retro_set_environment(retro_environment_t cb)
 #endif
 }
 
-EXPORT void retro_init(void)
+void retro_init(void)
 {
    struct retro_log_callback log;
    if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
@@ -386,16 +368,16 @@ EXPORT void retro_init(void)
    log_cb(RETRO_LOG_DEBUG, "%.3i%c t%st", 12, '3', "es");
 }
 
-EXPORT void retro_deinit(void) {}
-EXPORT unsigned retro_api_version(void) { return RETRO_API_VERSION; }
+void retro_deinit(void) {}
+unsigned retro_api_version(void) { return RETRO_API_VERSION; }
 
-EXPORT void retro_get_system_info(struct retro_system_info *info)
+void retro_get_system_info(struct retro_system_info *info)
 {
    const struct retro_system_info myinfo={ "minir test core", "v1.00", "c|h", false, false };
    memcpy(info, &myinfo, sizeof(myinfo));
 }
 
-EXPORT void retro_get_system_av_info(struct retro_system_av_info* info)
+void retro_get_system_av_info(struct retro_system_av_info* info)
 {
    const struct retro_system_av_info myinfo={
       { 320, 240, 320, 240, 0.0 },
@@ -404,16 +386,16 @@ EXPORT void retro_get_system_av_info(struct retro_system_av_info* info)
    memcpy(info, &myinfo, sizeof(myinfo));
 }
 
-EXPORT void retro_set_controller_port_device(unsigned port, unsigned device) {}
+void retro_set_controller_port_device(unsigned port, unsigned device) {}
 
-EXPORT void retro_reset(void)
+void retro_reset(void)
 {
    memset(&state, 0, sizeof(state));
    state.testgroup=init_grp;
    state.testsub=init_sub;
 }
 
-EXPORT void retro_run(void)
+void retro_run(void)
 {
    bool canchange;
    unsigned i;
@@ -521,14 +503,14 @@ EXPORT void retro_run(void)
    video_cb(pixels, 320, 240, sizeof(pixel_t)*320);
 }
 
-EXPORT size_t retro_serialize_size(void) { return sizeof(state); }
-EXPORT bool retro_serialize(void* data, size_t size)
+size_t retro_serialize_size(void) { return sizeof(state); }
+bool retro_serialize(void* data, size_t size)
 {
    if (size<sizeof(state)) return false;
    memcpy(data, &state, sizeof(state));
    return true;
 }
-EXPORT bool retro_unserialize(const void* data, size_t size)
+bool retro_unserialize(const void* data, size_t size)
 {
    if (size<sizeof(state)) return false;
    memcpy(&state, data, sizeof(state));
@@ -536,20 +518,20 @@ EXPORT bool retro_unserialize(const void* data, size_t size)
    return true;
 }
 
-EXPORT void retro_cheat_reset(void) {}
-EXPORT void retro_cheat_set(unsigned index, bool enabled, const char* code) {}
-EXPORT bool retro_load_game(const struct retro_game_info* game)
+void retro_cheat_reset(void) {}
+void retro_cheat_set(unsigned index, bool enabled, const char* code) {}
+bool retro_load_game(const struct retro_game_info* game)
 {
    retro_reset();
    enum retro_pixel_format rgb565=(enum retro_pixel_format)PIXFMT;
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb565)) return false;
    return true;
 }
-EXPORT bool retro_load_game_special(unsigned game_type, const struct retro_game_info* info, size_t num_info) { return false; }
-EXPORT void retro_unload_game(void) {}
-EXPORT unsigned retro_get_region(void) { return RETRO_REGION_NTSC; }
-EXPORT void* retro_get_memory_data(unsigned id) { return NULL; }
-EXPORT size_t retro_get_memory_size(unsigned id) { return 0; }
+bool retro_load_game_special(unsigned game_type, const struct retro_game_info* info, size_t num_info) { return false; }
+void retro_unload_game(void) {}
+unsigned retro_get_region(void) { return RETRO_REGION_NTSC; }
+void* retro_get_memory_data(unsigned id) { return NULL; }
+size_t retro_get_memory_size(unsigned id) { return 0; }
 
 /* blatant zsnes copypasta */
 unsigned char zfont[]={
