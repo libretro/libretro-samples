@@ -403,13 +403,13 @@ void retro_run(void)
          state.testsub='a';
          changed=true;
       }
-      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_LEFT))
+      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_LEFT) && groupsizes[state.testgroup-1]!=1)
       {
          state.testsub--;
          if (state.testsub=='a'-1) state.testsub=groupsizes[state.testgroup-1]+'a'-1;
          changed=true;
       }
-      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_RIGHT))
+      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_RIGHT) && groupsizes[state.testgroup-1]!=1)
       {
          state.testsub++;
          if (state.testsub-1==groupsizes[state.testgroup-1]+'a'-1) state.testsub='a';
@@ -455,7 +455,6 @@ void retro_run(void)
    testid[0] = '0'+state.testgroup;
    testid[1] = state.testsub;
    testid[2] = '\0';
-   
    renderstr(p_wht, testid, 7, 7);
    renderstr(p_wht, testid, 8, 7);
    renderstr(p_wht, testid, 9, 7);
