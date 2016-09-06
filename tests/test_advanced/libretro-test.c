@@ -128,13 +128,16 @@ static void test1a(void)
 
 static void test1b(void)
 {
-   unsigned p;
-   for (p=0;p<320*240;p++)
+   unsigned x,y;
+   for (y=0;y<240;y++)
    {
-      if ((p+state.frame)%30 > 15)
-         pixels[p]=p_blk|p_x;
-      else
-         pixels[p]=p_wht|p_x;
+      for (x=0;x<320;x++)
+      {
+         if (((240-y)+state.frame)%30 > 15)
+            pixels[y*320+x]=p_blk|p_x;
+         else
+            pixels[y*320+x]=p_wht|p_x;
+      }
    }
 }
 
