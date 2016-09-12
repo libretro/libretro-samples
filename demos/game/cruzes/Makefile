@@ -71,18 +71,13 @@ clean:
 $(target): $(generated) $(objects) 
 	$(cc) -o $(target) $(ldirs) $(lflags) -shared $(fpic) $(objects) $(libs)
 
-$(objdir)carlito.zip:
-	$(MKDIR_P) $(objdir)
-	wget -P $(objdir) http://openfontlibrary.org/assets/downloads/carlito/8b80255a5a467b7af83add3ceec73209/carlito.zip
-	unzip -u -j -d $(objdir) $(objdir)carlito.zip
-
-font24.h: ttf2c $(objdir)carlito.zip
+font24.h: ttf2c $(objdir)Carlito-Regular.ttf
 	./ttf2c 24 font24 $(objdir)Carlito-Regular.ttf font24.h
 
-font16.h: ttf2c $(objdir)carlito.zip
+font16.h: ttf2c $(objdir)Carlito-Regular.ttf
 	./ttf2c 16 font16 $(objdir)Carlito-Regular.ttf font16.h
 
-font10.h: ttf2c $(objdir)carlito.zip
+font10.h: ttf2c $(objdir)Carlito-Regular.ttf
 	./ttf2c 10 font10 $(objdir)Carlito-Regular.ttf font10.h
 
 ttf2c: ttf2c.c Makefile
