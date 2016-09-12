@@ -12,7 +12,7 @@ else ifneq ($(findstring win,$(shell uname -a)),)
 endif
 endif
 
-TARGET_NAME := boxes
+TARGET_NAME := testgl_compute_shaders
 
 ifeq ($(platform), unix)
    TARGET := $(TARGET_NAME)_libretro.so
@@ -46,7 +46,7 @@ endif
 CXXFLAGS += -std=gnu++11 -Wall $(fpic) -DHAVE_ZIP_DEFLATE
 CFLAGS += -std=gnu99 -Wall $(fpic) -DHAVE_ZIP_DEFLATE
 
-SOURCES := $(wildcard libretro/*.cpp) $(wildcard gl/*.cpp) app/$(TARGET_NAME).cpp
+SOURCES := $(wildcard libretro/*.cpp) $(wildcard gl/*.cpp) $(wildcard app/*.cpp)
 CSOURCES = $(wildcard rpng/*.c) glsym/rglgen.c
 LIBS += $(GL_LIB) 
 CSOURCES += glsym/glsym_gl.c
