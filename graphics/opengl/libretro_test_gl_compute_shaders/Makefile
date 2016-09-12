@@ -39,8 +39,8 @@ ifeq ($(DEBUG), 1)
    CXXFLAGS += -O0 -g -DGL_DEBUG
    CFLAGS += -O0 -g
 else
-   CXXFLAGS += -O3 -g
-   CFLAGS += -O3 -g
+   CXXFLAGS += -O3 -DNDEBUG
+   CFLAGS += -O3 -DNDEBUG
 endif
 
 CXXFLAGS += -std=gnu++11 -Wall $(fpic) -DHAVE_ZIP_DEFLATE
