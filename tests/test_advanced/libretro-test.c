@@ -509,7 +509,6 @@ bool retro_unserialize(const void* data, size_t size)
 {
    if (size<sizeof(state)) return false;
    memcpy(&state, data, sizeof(state));
-   state.frame++;
    return true;
 }
 
