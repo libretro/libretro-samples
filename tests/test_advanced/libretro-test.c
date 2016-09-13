@@ -71,9 +71,9 @@ static struct
    uint8_t test3a_activate;
    uint64_t test3a_last;
    uint16_t test4a[28*3];
+   uint16_t inpstate[2];
 } state;
 
-uint16_t inpstate[2];
 bool sound_enable;
 pixel_t pixels[240*320];
 
@@ -210,7 +210,7 @@ static void test2a(void)
 
 static void test2b(void)
 {
-   if (inpstate[0]&0x0F0F)
+   if (state.inpstate[0]&0x0F0F)
    {
       memset(pixels, 0x00, sizeof(pixels));
       sound_enable=true;
@@ -261,9 +261,9 @@ static void test3a(void)
       state.test3a_activate=2;
    }
    
-   if (state.test3a_activate==0 && inpstate[0]&0xFF0F)
+   if (state.test3a_activate==0 && state.inpstate[0]&0xFF0F)
       state.test3a_activate=1;
-   if (state.test3a_activate==2 && !inpstate[0])
+   if (state.test3a_activate==2 && !state.inpstate[0])
       state.test3a_activate=0;
    
    for (i=0;i<320*240;i++)
@@ -291,14 +291,14 @@ static void test4a(void)
    uint16_t color;
    unsigned i;
 
-   if (inpstate[0]!=state.test4a[27*3+1] || inpstate[1]!=state.test4a[27*3+2])
+   if (state.inpstate[0]!=state.test4a[27*3+1] || state.inpstate[1]!=state.test4a[27*3+2])
    {
       for (i=0;i<27*3;i++)
          state.test4a[0*3+i]=state.test4a[0*3+i+3];
 
       state.test4a[27*3+0]=state.frame;
-      state.test4a[27*3+1]=inpstate[0];
-      state.test4a[27*3+2]=inpstate[1];
+      state.test4a[27*3+1]=state.inpstate[0];
+      state.test4a[27*3+2]=state.inpstate[1];
    }
    
    color=(~crc32_calc((unsigned char*)state.test4a, 6*28, ~0U))&p_dark;
@@ -346,6 +346,9 @@ void retro_init(void)
    
    log_cb(RETRO_LOG_DEBUG, "0123 test");
    log_cb(RETRO_LOG_DEBUG, "%.3i%c t%st", 12, '3', "es");
+
+   enum retro_pixel_format rgb565=(enum retro_pixel_format)PIXFMT;
+   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb565)) return false;
 }
 
 void retro_deinit(void) {}
@@ -383,41 +386,41 @@ void retro_run(void)
    char testid[3];
 
    poller_cb();
-   canchange=((inpstate[0]&0x00F0)==0);
-   inpstate[0] = 0x0000;
-   inpstate[1] = 0x0000;
+   canchange=((state.inpstate[0]&0x00F0)==0);
+   state.inpstate[0] = 0x0000;
+   state.inpstate[1] = 0x0000;
 
    for (i=0;i<16;i++)
    {
-      inpstate[0]|=(input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i))<<i;
-      inpstate[1]|=(input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, i))<<i;
+      state.inpstate[0]|=(input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i))<<i;
+      state.inpstate[1]|=(input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, i))<<i;
    }
    sound_enable=false;
    
    if (canchange)
    {
       bool changed=false;
-      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_UP))
+      if (state.inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_UP))
       {
          state.testgroup--;
          if (state.testgroup==0) state.testgroup=numgroups;
          state.testsub='a';
          changed=true;
       }
-      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
+      if (state.inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
       {
          state.testgroup++;
          if (state.testgroup-1==numgroups) state.testgroup=1;
          state.testsub='a';
          changed=true;
       }
-      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_LEFT) && groupsizes[state.testgroup-1]!=1)
+      if (state.inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_LEFT) && groupsizes[state.testgroup-1]!=1)
       {
          state.testsub--;
          if (state.testsub=='a'-1) state.testsub=groupsizes[state.testgroup-1]+'a'-1;
          changed=true;
       }
-      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_RIGHT) && groupsizes[state.testgroup-1]!=1)
+      if (state.inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_RIGHT) && groupsizes[state.testgroup-1]!=1)
       {
          state.testsub++;
          if (state.testsub-1==groupsizes[state.testgroup-1]+'a'-1) state.testsub='a';
@@ -509,7 +512,6 @@ bool retro_unserialize(const void* data, size_t size)
 {
    if (size<sizeof(state)) return false;
    memcpy(&state, data, sizeof(state));
-   state.frame++;
    return true;
 }
 
@@ -522,11 +524,11 @@ bool retro_load_game(const struct retro_game_info* game)
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb565)) return false;
    return true;
 }
-bool retro_load_game_special(unsigned game_type, const struct retro_game_info* info, size_t num_info) { return false; }
+bool retro_load_game_special(unsigned game_type, const struct retro_game_info* info, size_t num_info) { return true; }
 void retro_unload_game(void) {}
 unsigned retro_get_region(void) { return RETRO_REGION_NTSC; }
-void* retro_get_memory_data(unsigned id) { return NULL; }
-size_t retro_get_memory_size(unsigned id) { return 0; }
+void* retro_get_memory_data(unsigned id) { return &state; }
+size_t retro_get_memory_size(unsigned id) { return sizeof(state); }
 
 /* blatant zsnes copypasta */
 unsigned char zfont[]={
