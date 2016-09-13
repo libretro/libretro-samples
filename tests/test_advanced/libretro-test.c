@@ -65,6 +65,7 @@ static struct
 {
    int testgroup;
    int testsub;
+   bool canchange;
 
    int frame;
 
@@ -377,13 +378,11 @@ void retro_reset(void)
 
 void retro_run(void)
 {
-   bool canchange;
    unsigned i;
 
    char testid[3];
 
    poller_cb();
-   canchange=((inpstate[0]&0x00F0)==0);
    inpstate[0] = 0x0000;
    inpstate[1] = 0x0000;
 
@@ -394,7 +393,7 @@ void retro_run(void)
    }
    sound_enable=false;
    
-   if (canchange)
+   if (state.canchange)
    {
       bool changed=false;
       if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_UP))
@@ -428,6 +427,7 @@ void retro_run(void)
          state.frame=0;
       }
    }
+   state.canchange = ((inpstate[0]&0x00F0)==0);
    
    if (state.testgroup==1)
    {
