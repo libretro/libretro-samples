@@ -26,10 +26,10 @@ idirs  := -I.
 cflags := -Wall -std=c99
 fpic   := -fPIC
 
-cflags_debug   := -g
-cflags_release := -O2 -g
+cflags_debug   := -O0 -g
+cflags_release := -O2
 
-ifneq ($(findstring debug,$(config)),)
+ifeq ($(DEBUG), 1)
 	cflags += $(cflags_debug)
 else
 	cflags += $(cflags_release)
