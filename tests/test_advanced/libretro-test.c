@@ -297,16 +297,16 @@ static void test4a(void)
       for (i=0;i<27*3;i++)
          state.test4a[0*3+i]=state.test4a[0*3+i+3];
 
-      state.test4a[27*3+0]=state.frame;
+      state.test4a[27*3+0]=state.frame+1;
       state.test4a[27*3+1]=inpstate[0];
       state.test4a[27*3+2]=inpstate[1];
    }
-   
+
    color=(~crc32_calc((unsigned char*)state.test4a, 6*28, ~0U))&p_dark;
 
    for (i=0;i<320*240;i++)
       pixels[i]=color;
-   
+
    for (i=0;i<28;i++)
    {
       if (state.test4a[i*3+0])
