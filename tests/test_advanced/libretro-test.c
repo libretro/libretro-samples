@@ -242,24 +242,43 @@ static void formatnum(char* out, unsigned int in)
    *out='\0';
 }
 
+static size_t test_inputspeed(void)
+{
+   size_t calls = 0;
+   
+   uint64_t start = cpu_features_get_time_usec();
+   unsigned iterlen = 32;
+   uint64_t now;
+   
+   double seconds;
+   
+   while (true)
+   {
+      unsigned i;
+      
+      now = cpu_features_get_time_usec();
+      if (now < start+10000 && iterlen<0x10000000) iterlen*=2; /* try to call the time function once per 10ms */
+      if (now > start+2000000) break;
+      
+      for (i=0;i<iterlen;i++)
+      {
+         input_state_cb((now^i)>>4)%2,
+               RETRO_DEVICE_JOYPAD, 0, (now^i)%16);
+         calls++;
+      }
+   }
+   
+   seconds = (double)(now-start) / 1000000.0;
+   return calls/seconds;
+}
+
 static void test3a(void)
 {
    unsigned i;
-   if (state.test3a_activate==1)
+   if (state.test3a_activate == 1)
    {
-      uint64_t end=cpu_features_get_time_usec()+2000000;
-      uint64_t n=0;
-      while (cpu_features_get_time_usec() < end)
-      {
-         for (i=0;i<32;i++)
-         {
-            input_state_cb(rand()%2,
-                  RETRO_DEVICE_JOYPAD, 0, rand()%16);
-            n++;
-         }
-      }
-      state.test3a_last=n/2;
-      state.test3a_activate=2;
+      state.test3a_last = test_inputspeed();
+      state.test3a_activate = 2;
    }
    
    if (state.test3a_activate==0 && inpstate[0]&0xFF0F)
