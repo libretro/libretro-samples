@@ -262,7 +262,7 @@ static size_t test_inputspeed(void)
       
       for (i=0;i<iterlen;i++)
       {
-         input_state_cb((now^i)>>4)%2,
+         input_state_cb(((now^i)>>4)%2,
                RETRO_DEVICE_JOYPAD, 0, (now^i)%16);
          calls++;
       }
