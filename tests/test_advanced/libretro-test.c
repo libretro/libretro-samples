@@ -115,6 +115,25 @@ static void test1a(void)
 {
    unsigned x, y;
 
+   for (y=0;y<240;y++)
+   for (x=0;x<320;x++)
+   {
+      pixels[y*320+x]=p_wht;
+   }
+
+   for (y=80;y<160;y++)
+   for (x=0;x<80;x++)
+   {
+      pixels[y*320 + 40+x] = p_red;
+      pixels[y*320 + 120+x] = p_grn;
+      pixels[y*320 + 200+x] = p_blu;
+   }
+}
+
+static void test1b(void)
+{
+   unsigned x, y;
+
    for (x=0;x<320;x++)
    {
       if ((x+state.frame)%40 > 20)
@@ -127,7 +146,7 @@ static void test1a(void)
       memcpy(pixels+(320*y), pixels+0, sizeof(*pixels)*320);
 }
 
-static void test1b(void)
+static void test1c(void)
 {
    unsigned x,y;
    for (y=0;y<240;y++)
@@ -142,7 +161,7 @@ static void test1b(void)
    }
 }
 
-static void test1c(void)
+static void test1d(void)
 {
    int i;
    if (state.frame&1)
@@ -157,7 +176,7 @@ static void test1c(void)
    }
 }
 
-static void test1d(void)
+static void test1e(void)
 {
    unsigned x, y;
    for (y=0;y<240;y++)
@@ -172,7 +191,7 @@ static void test1d(void)
    }
 }
 
-static void test1e(void)
+static void test1f(void)
 {
    unsigned x, y;
    for (x=0;x<320*240;x++)
@@ -460,6 +479,8 @@ void retro_run(void)
          test1d();
       if (state.testsub=='e')
          test1e();
+      if (state.testsub=='f')
+         test1f();
    }
    if (state.testgroup==2)
    {

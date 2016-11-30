@@ -8,11 +8,12 @@ Up and Down will cycle between the test groups. Left and Right will cycle
 between the tests in each group.
 
 1. Video output
-1a. Tearing test, horizontal: Vertical lines moving horizontally. In pixel format XRGB8888, the Xs will be 00.
-1b. Tearing test, vertical:   Horizontal lines moving vertically. In pixel format XRGB8888, the Xs will be FF.
-1c. vsync test:               Flickers between white and black each frame.
-1d. Stretching test:          A checkerboard of black and white, to test if each square looks smooth.
-1e. Border test:              A white screen, with red and yellow borders.
+1a. Color test:               A static image, with one red, one green and one blue rectangle, to ensure the channels aren't mixed up.
+1b. Tearing test, horizontal: Vertical lines moving horizontally. In pixel format XRGB8888, the Xs will be 00.
+1c. Tearing test, vertical:   Horizontal lines moving vertically. In pixel format XRGB8888, the Xs will be FF.
+1d. vsync test:               Flickers between white and black each frame.
+1e. Stretching test:          A checkerboard of black and white, to test if each square looks smooth.
+1f. Border test:              A white screen, with red and yellow borders.
 
 2. Latency and synchronization
 2a. A/V sync test. Will switch between white and silent, and black and noisy, every two seconds.
