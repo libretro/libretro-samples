@@ -99,7 +99,7 @@ uint64_t cpu_features_get_time_usec()
    if (!freq.QuadPart) QueryPerformanceFrequency(&freq);
    LARGE_INTEGER count;
    QueryPerformanceCounter(&count);
-   
+
    return count.QuadPart * 1000000 / freq.QuadPart;
 }
 #else
@@ -118,13 +118,13 @@ static void test1a(void)
    for (y=0;y<240;y++)
    for (x=0;x<320;x++)
    {
-      pixels[y*320+x]=p_wht;
+      pixels[y*320+x] = p_wht;
    }
 
    for (y=80;y<160;y++)
    for (x=0;x<80;x++)
    {
-      pixels[y*320 + 40+x] = p_red;
+      pixels[y*320 +  40+x] = p_red;
       pixels[y*320 + 120+x] = p_grn;
       pixels[y*320 + 200+x] = p_blu;
    }
@@ -137,9 +137,9 @@ static void test1b(void)
    for (x=0;x<320;x++)
    {
       if ((x+state.frame)%40 > 20)
-         pixels[x]=p_blk;
+         pixels[x] = p_blk;
       else
-         pixels[x]=p_wht;
+         pixels[x] = p_wht;
    }
 
    for (y=1;y<240;y++)
@@ -184,9 +184,9 @@ static void test1e(void)
       for (x=0;x<320;x++)
       {
          if ((y^x) & 1)
-            pixels[y*320+x]=p_wht;
+            pixels[y*320+x] = p_wht;
          else
-            pixels[y*320+x]=p_blk;
+            pixels[y*320+x] = p_blk;
       }
    }
 }
@@ -201,14 +201,14 @@ static void test1f(void)
 
    for (x=0;x<320;x++)
    {
-      pixels[        x]=((x&1)?p_red:p_yel);
-      pixels[239*320+x]=((x&1)?p_yel:p_red);
+      pixels[        x] = ((x&1)?p_red:p_yel);
+      pixels[239*320+x] = ((x&1)?p_yel:p_red);
    }
 
    for (y=0;y<240;y++)
    {
-      pixels[y*320+  0]=((y&1)?p_red:p_yel);
-      pixels[y*320+319]=((y&1)?p_yel:p_red);
+      pixels[y*320+  0] = ((y&1)?p_red:p_yel);
+      pixels[y*320+319] = ((y&1)?p_yel:p_red);
    }
 }
 
@@ -218,13 +218,13 @@ static void test2a(void)
    {
       memset(pixels, 0x00, sizeof(pixels));
       memset(pixels+(320*(state.frame%120)*2), 0xFF, sizeof(*pixels)*2);
-      sound_enable=true;
+      sound_enable = true;
    }
    else
    {
       memset(pixels, 0xFF, sizeof(pixels));
       memset(pixels+(320*(state.frame%120)*2), 0x00, sizeof(*pixels)*2);
-      sound_enable=false;
+      sound_enable = false;
    }
 }
 
@@ -233,12 +233,12 @@ static void test2b(void)
    if (inpstate[0]&0x0F0F)
    {
       memset(pixels, 0x00, sizeof(pixels));
-      sound_enable=true;
+      sound_enable = true;
    }
    else
    {
       memset(pixels, 0xFF, sizeof(pixels));
-      sound_enable=false;
+      sound_enable = false;
    }
 }
 
@@ -249,14 +249,14 @@ static void formatnum(char* out, unsigned int in)
 
    sprintf(tmp, "%.10u", in);
 
-   while (tmp[pos]=='0')
+   while (tmp[pos] == '0')
       pos++;
-   *out++=tmp[pos++];
+   *out++ = tmp[pos++];
 
    while (tmp[pos])
    {
-      if (pos%3 == 1) *out++=',';
-      *out++=tmp[pos++];
+      if (pos%3 == 1) *out++ = ',';
+      *out++ = tmp[pos++];
    }
    *out='\0';
 }
@@ -264,21 +264,21 @@ static void formatnum(char* out, unsigned int in)
 static size_t test_inputspeed(void)
 {
    size_t calls = 0;
-   
+
    uint64_t start = cpu_features_get_time_usec();
    unsigned iterlen = 32;
    uint64_t now;
-   
+
    double seconds;
-   
+
    while (true)
    {
       unsigned i;
-      
+
       now = cpu_features_get_time_usec();
       if (now < start+10000 && iterlen<0x10000000) iterlen*=2; /* try to call the time function once per 10ms */
       if (now > start+2000000) break;
-      
+
       for (i=0;i<iterlen;i++)
       {
          input_state_cb(((now^i)>>4)%2,
@@ -286,7 +286,7 @@ static size_t test_inputspeed(void)
          calls++;
       }
    }
-   
+
    seconds = (double)(now-start) / 1000000.0;
    return calls/seconds;
 }
@@ -299,18 +299,18 @@ static void test3a(void)
       state.test3a_last = test_inputspeed();
       state.test3a_activate = 2;
    }
-   
-   if (state.test3a_activate==0 && inpstate[0]&0xFF0F)
-      state.test3a_activate=1;
-   if (state.test3a_activate==2 && !inpstate[0])
-      state.test3a_activate=0;
-   
+
+   if (state.test3a_activate == 0 && inpstate[0]&0xFF0F)
+      state.test3a_activate = 1;
+   if (state.test3a_activate == 2 && !inpstate[0])
+      state.test3a_activate = 0;
+
    for (i=0;i<320*240;i++)
-      pixels[i]=p_wht;
-   
-   if (state.test3a_activate==1)
+      pixels[i] = p_wht;
+
+   if (state.test3a_activate == 1)
       renderstr(p_blk, "Running...", 8, 16);
-   else if (state.test3a_last==0)
+   else if (state.test3a_last == 0)
       renderstr(p_blk, "Ready", 8, 16);
    else
    {
@@ -318,7 +318,7 @@ static void test3a(void)
       formatnum(line, state.test3a_last);
       strcat(line, " calls per second");
       renderstr(p_blk, line, 8, 16);
-      
+
       formatnum(line, state.test3a_last/60);
       strcat(line, " calls per frame");
       renderstr(p_blk, line, 8, 24);
@@ -330,20 +330,20 @@ static void test4a(void)
    uint16_t color;
    unsigned i;
 
-   if (inpstate[0]!=state.test4a[27*3+1] || inpstate[1]!=state.test4a[27*3+2])
+   if (inpstate[0] != state.test4a[27*3+1] || inpstate[1] != state.test4a[27*3+2])
    {
       for (i=0;i<27*3;i++)
-         state.test4a[0*3+i]=state.test4a[0*3+i+3];
+         state.test4a[0*3+i] = state.test4a[0*3+i+3];
 
-      state.test4a[27*3+0]=state.frame+1;
-      state.test4a[27*3+1]=inpstate[0];
-      state.test4a[27*3+2]=inpstate[1];
+      state.test4a[27*3+0] = state.frame+1;
+      state.test4a[27*3+1] = inpstate[0];
+      state.test4a[27*3+2] = inpstate[1];
    }
 
-   color=(~crc32_calc((unsigned char*)state.test4a, 6*28, ~0U))&p_dark;
+   color = (~crc32_calc((unsigned char*)state.test4a, 6*28, ~0U))&p_dark;
 
    for (i=0;i<320*240;i++)
-      pixels[i]=color;
+      pixels[i] = color;
 
    for (i=0;i<28;i++)
    {
@@ -364,11 +364,11 @@ void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 void retro_set_environment(retro_environment_t cb)
 {
-   environ_cb=cb;
-   
-   bool True=true;
+   environ_cb = cb;
+
+   bool True = true;
    environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &True);
-   
+
 #if 0
    environ_cb(RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK, &frametime_g);
    environ_cb(RETRO_ENVIRONMENT_GET_PERF_INTERFACE, &perf);
@@ -382,7 +382,7 @@ void retro_init(void)
       log_cb = log.log;
    else
       log_cb = log_null;
-   
+
    log_cb(RETRO_LOG_DEBUG, "0123 test");
    log_cb(RETRO_LOG_DEBUG, "%.3i%c t%st", 12, '3', "es");
 }
@@ -392,13 +392,13 @@ unsigned retro_api_version(void) { return RETRO_API_VERSION; }
 
 void retro_get_system_info(struct retro_system_info *info)
 {
-   const struct retro_system_info myinfo={ "minir test core", "v1.00", "c|h", false, false };
+   const struct retro_system_info myinfo = { "minir test core", "v1.00", "c|h", false, false };
    memcpy(info, &myinfo, sizeof(myinfo));
 }
 
 void retro_get_system_av_info(struct retro_system_av_info* info)
 {
-   const struct retro_system_av_info myinfo={
+   static const struct retro_system_av_info myinfo = {
       { 320, 240, 320, 240, 0.0 },
       { 60.0, 30720.0 }
    };
@@ -410,8 +410,8 @@ void retro_set_controller_port_device(unsigned port, unsigned device) {}
 void retro_reset(void)
 {
    memset(&state, 0, sizeof(state));
-   state.testgroup=init_grp;
-   state.testsub=init_sub;
+   state.testgroup = init_grp;
+   state.testsub = init_sub;
 }
 
 void retro_run(void)
@@ -426,80 +426,80 @@ void retro_run(void)
 
    for (i=0;i<16;i++)
    {
-      inpstate[0]|=(input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i))<<i;
-      inpstate[1]|=(input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, i))<<i;
+      inpstate[0] |= (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i))<<i;
+      inpstate[1] |= (input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, i))<<i;
    }
-   sound_enable=false;
-   
+   sound_enable = false;
+
    if (state.canchange)
    {
-      bool changed=false;
+      bool changed = false;
       if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_UP))
       {
          state.testgroup--;
-         if (state.testgroup==0) state.testgroup=numgroups;
-         state.testsub='a';
+         if (state.testgroup == 0) state.testgroup = numgroups;
+         state.testsub = 'a';
          changed=true;
       }
       if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
       {
          state.testgroup++;
-         if (state.testgroup-1==numgroups) state.testgroup=1;
-         state.testsub='a';
-         changed=true;
+         if (state.testgroup-1 == numgroups) state.testgroup=1;
+         state.testsub = 'a';
+         changed = true;
       }
-      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_LEFT) && groupsizes[state.testgroup-1]!=1)
+      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_LEFT) && groupsizes[state.testgroup-1] != 1)
       {
          state.testsub--;
-         if (state.testsub=='a'-1) state.testsub=groupsizes[state.testgroup-1]+'a'-1;
+         if (state.testsub == 'a'-1) state.testsub=groupsizes[state.testgroup-1]+'a'-1;
          changed=true;
       }
-      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_RIGHT) && groupsizes[state.testgroup-1]!=1)
+      if (inpstate[0]&(1<<RETRO_DEVICE_ID_JOYPAD_RIGHT) && groupsizes[state.testgroup-1] != 1)
       {
          state.testsub++;
-         if (state.testsub-1==groupsizes[state.testgroup-1]+'a'-1) state.testsub='a';
+         if (state.testsub-1 == groupsizes[state.testgroup-1]+'a'-1) state.testsub='a';
          changed=true;
       }
       if (changed)
       {
-         state.frame=0;
+         state.frame = 0;
       }
    }
    state.canchange = ((inpstate[0]&0x00F0)==0);
-   
-   if (state.testgroup==1)
+
+   if (state.testgroup == 1)
    {
-      if (state.testsub=='a')
+      if (state.testsub == 'a')
          test1a();
-      if (state.testsub=='b')
+      if (state.testsub == 'b')
          test1b();
-      if (state.testsub=='c')
+      if (state.testsub == 'c')
          test1c();
-      if (state.testsub=='d')
+      if (state.testsub == 'd')
          test1d();
-      if (state.testsub=='e')
+      if (state.testsub == 'e')
          test1e();
-      if (state.testsub=='f')
+      if (state.testsub == 'f')
          test1f();
    }
-   if (state.testgroup==2)
+   if (state.testgroup == 2)
    {
-      if (state.testsub=='a')
+      if (state.testsub == 'a')
          test2a();
-      if (state.testsub=='b')
+      if (state.testsub == 'b')
          test2b();
    }
-   if (state.testgroup==3)
+   if (state.testgroup == 3)
    {
-      if (state.testsub=='a')
+      if (state.testsub == 'a')
          test3a();
    }
-   if (state.testgroup==4)
+   if (state.testgroup == 4)
    {
       if (state.testsub=='a')
          test4a();
    }
-   
+
    testid[0] = '0'+state.testgroup;
    testid[1] = state.testsub;
    testid[2] = '\0';
@@ -512,16 +512,16 @@ void retro_run(void)
    renderstr(p_wht, testid, 8, 9);
    renderstr(p_wht, testid, 9, 9);
    renderstr(p_blk, testid, 8, 8);
-   
+
    state.frame++;
-   
+
    if (sound_enable)
    {
       int16_t data[8*64*2];
       for (i=0;i<8*64;i++)
       {
-         data[i*2]=sin(((double)(state.frame*8*64 + i))/30720*2*PI * 440)*4096;
-         data[i*2+1]=data[i*2];
+         data[i*2] = sin(((double)(state.frame*8*64 + i))/30720*2*PI * 440)*4096;
+         data[i*2+1] = data[i*2];
       }
       for (i=0;i<8;i++)
       {
@@ -534,7 +534,7 @@ void retro_run(void)
       memset(data, 0, sizeof(data));
       for (i=0;i<8;i++) audio_batch_cb(data, 64);
    }
-   
+
    video_cb(pixels, 320, 240, sizeof(pixel_t)*320);
 }
 
@@ -615,7 +615,7 @@ void renderchr(pixel_t col, int chr, int x, int y)
 {
    int ix;
    int iy;
-   
+
    for (iy=0;iy<5;iy++)
    {
       for (ix=0;ix<8;ix++)
@@ -651,7 +651,7 @@ unsigned long crc32_calc (unsigned char *ptr, unsigned cnt, unsigned long crc)
         crc = ( crc >> 4 ) ^ Crc32[(crc & 0xf) ^ (*ptr & 0xf)];
         crc = ( crc >> 4 ) ^ Crc32[(crc & 0xf) ^ (*ptr++ >> 4)];
     }
- 
+
     return crc;
 }
 

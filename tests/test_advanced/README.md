@@ -27,6 +27,8 @@ between the tests in each group.
 4a. Input sync. All button presses are sent to the screen; a hash of that is used as background color
     (varies between pixel formats), for easy comparison.
 
+It will also print two messages to RETRO_ENVIRONMENT_GET_LOG_INTERFACE, which should be identical.
+
 ## Programming language
 C
 
