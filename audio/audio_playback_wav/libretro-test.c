@@ -19,21 +19,21 @@ retro_input_poll_t poller_cb              = NULL;
 retro_input_state_t input_state_cb        = NULL;
 
 #ifndef EXTERNC
- #ifdef __cplusplus
-  #define EXTERNC extern "C"
- #else
-  #define EXTERNC
- #endif
+#ifdef __cplusplus
+#define EXTERNC extern "C"
+#else
+#define EXTERNC
+#endif
 #endif
 
 #ifndef EXPORT
- #if defined(CPPCLI)
-  #define EXPORT EXTERNC
- #elif defined(_WIN32)
-  #define EXPORT EXTERNC __declspec(dllexport)
- #else
-  #define EXPORT EXTERNC __attribute__((visibility("default")))
- #endif
+#if defined(CPPCLI)
+#define EXPORT EXTERNC
+#elif defined(_WIN32)
+#define EXPORT EXTERNC __declspec(dllexport)
+#else
+#define EXPORT EXTERNC __attribute__((visibility("default")))
+#endif
 #endif
 
 struct WAVhead
@@ -72,89 +72,89 @@ enum
 
 static void emit_audio(void)
 {
-	unsigned int samples_to_play;
+   unsigned int samples_to_play;
    unsigned int samples_played  = 0;
 
-	if (state == ST_OFF)
+   if (state == ST_OFF)
       return;
 
-	if (state == ST_ON)
+   if (state == ST_ON)
       samples_to_play=BUFSIZE;
-	if (state == ST_AUTO)
+   if (state == ST_AUTO)
       samples_to_play=g_samples_to_play;
 
    /* no locking here, despite threading; 
     * if we touch this variable, threading is off. */
 
-	while (samples_to_play >= BUFSIZE)
-	{
+   while (samples_to_play >= BUFSIZE)
+   {
       unsigned int played;
-		int16_t samples[2*BUFSIZE];
-		unsigned int samples_to_read = samples_to_play;
-      
-		if (samples_to_read > BUFSIZE)
-         samples_to_read = BUFSIZE;
-		if (sample_pos > samples_tot)
-         sample_pos = samples_tot;
-		if (sample_pos + samples_to_read > samples_tot)
-         samples_to_read = samples_tot-sample_pos;
-		
-		if (samples_to_read != 0)
-		{
-         unsigned i;
-			uint8_t* rawsamples8  = (uint8_t*)rawsamples + bytes_per_sample * sample_pos;
-			int16_t* rawsamples16 = (int16_t*)rawsamples8;
-			
-			for (i = 0; i < samples_to_read; i++)
-			{
-				int16_t left  = 0;
-				int16_t right = 0;
+      int16_t samples[2*BUFSIZE];
+      unsigned int samples_to_read = samples_to_play;
 
-				if (head.NumChannels == 1 && head.BitsPerSample==8)
+      if (samples_to_read > BUFSIZE)
+         samples_to_read = BUFSIZE;
+      if (sample_pos > samples_tot)
+         sample_pos = samples_tot;
+      if (sample_pos + samples_to_read > samples_tot)
+         samples_to_read = samples_tot-sample_pos;
+
+      if (samples_to_read != 0)
+      {
+         unsigned i;
+         uint8_t* rawsamples8  = (uint8_t*)rawsamples + bytes_per_sample * sample_pos;
+         int16_t* rawsamples16 = (int16_t*)rawsamples8;
+
+         for (i = 0; i < samples_to_read; i++)
+         {
+            int16_t left  = 0;
+            int16_t right = 0;
+
+            if (head.NumChannels == 1 && head.BitsPerSample==8)
             {
                left  = rawsamples8[i] * AMP_MUL;
                right = rawsamples8[i] * AMP_MUL;
             }
-				if (head.NumChannels == 2 && head.BitsPerSample==8)
+            if (head.NumChannels == 2 && head.BitsPerSample==8)
             {
                left  = rawsamples8[i*2] * AMP_MUL;
                right = rawsamples8[i*2+1]*AMP_MUL;
             }
-				if (head.NumChannels==1 && head.BitsPerSample==16)
+            if (head.NumChannels==1 && head.BitsPerSample==16)
             {
                left  = rawsamples16[i];
                right = rawsamples16[i];
             }
-				if (head.NumChannels==2 && head.BitsPerSample==16)
+            if (head.NumChannels==2 && head.BitsPerSample==16)
             {
                left  = rawsamples16[i*2];
                right = rawsamples16[i*2+1];
             }
-				
-				samples[i*2+0] = left;
-				samples[i*2+1] = right;
-			}
-		}
 
-		if (samples_to_read!=BUFSIZE)
+            samples[i*2+0] = left;
+            samples[i*2+1] = right;
+         }
+      }
+
+      if (samples_to_read!=BUFSIZE)
          memset(samples + samples_to_read * 2,
                0,
                sizeof(int16_t) * 2 * (BUFSIZE-samples_to_read));
-		
-		played               = audio_batch_cb(samples, BUFSIZE);
-		sample_pos          += played;
-		samples_played      += played;
 
-		if (samples_to_play < played)
+      played               = audio_batch_cb(samples, BUFSIZE);
+      sample_pos          += played;
+      samples_played      += played;
+
+      if (samples_to_play < played)
          break;
 
-		samples_to_play -= played;
+      samples_to_play -= played;
 
-		if (played != BUFSIZE)
+      if (played != BUFSIZE)
          break;
-	}
+   }
 
-	if (state == ST_AUTO)
+   if (state == ST_AUTO)
       g_samples_to_play-=samples_played;
 }
 
@@ -190,11 +190,11 @@ EXPORT void retro_set_input_state(retro_input_state_t cb)
 
 EXPORT void retro_set_environment(retro_environment_t cb)
 {
-	struct retro_audio_callback aud = { emit_audio, enable_audio };
-	environ_cb = cb;
-	state      = ST_AUTO;
+   struct retro_audio_callback aud = { emit_audio, enable_audio };
+   environ_cb = cb;
+   state      = ST_AUTO;
 
-	if (environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &aud))
+   if (environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &aud))
       state = ST_OFF;
 }
 
@@ -212,17 +212,17 @@ EXPORT void retro_init(void)
 
 EXPORT void retro_get_system_info(struct retro_system_info* info)
 {
-	const struct retro_system_info myinfo={ "WAV player", "v1", "wav", false, false };
-	memcpy(info, &myinfo, sizeof(myinfo));
+   const struct retro_system_info myinfo={ "WAV player", "v1", "wav", false, false };
+   memcpy(info, &myinfo, sizeof(myinfo));
 }
 
 EXPORT void retro_get_system_av_info(struct retro_system_av_info* info)
 {
-	const struct retro_system_av_info myinfo={
-		{ 320, 240, 320, 240, 0.0 },
-		{ 60.0, head.SampleRate }
-	};
-	memcpy(info, &myinfo, sizeof(myinfo));
+   const struct retro_system_av_info myinfo={
+      { 320, 240, 320, 240, 0.0 },
+      { 60.0, head.SampleRate }
+   };
+   memcpy(info, &myinfo, sizeof(myinfo));
 }
 
 EXPORT void retro_reset(void)
@@ -232,29 +232,29 @@ EXPORT void retro_reset(void)
 
 EXPORT void retro_run(void)
 {
-	static uint16_t pixels[240][320];
+   static uint16_t pixels[240][320];
    unsigned int x;
 
-	poller_cb();
-	
-	if (state == ST_AUTO)
-	{
-		g_samples_to_play += head.SampleRate / 60.0;
-		emit_audio();
-	}
-	
-	memset(pixels, 0xFF, sizeof(pixels));
-	
-	x = 320 * sample_pos / samples_tot;
+   poller_cb();
 
-	if (x<320)
-	{
+   if (state == ST_AUTO)
+   {
+      g_samples_to_play += head.SampleRate / 60.0;
+      emit_audio();
+   }
+
+   memset(pixels, 0xFF, sizeof(pixels));
+
+   x = 320 * sample_pos / samples_tot;
+
+   if (x<320)
+   {
       unsigned y;
-		for (y = 0; y < 240; y++)
-			pixels[y][x] = 0x0000;
-	}
-	
-	video_cb(pixels, 320, 240, sizeof(uint16_t) * 320);
+      for (y = 0; y < 240; y++)
+         pixels[y][x] = 0x0000;
+   }
+
+   video_cb(pixels, 320, 240, sizeof(uint16_t) * 320);
 }
 
 EXPORT size_t retro_serialize_size(void)
@@ -276,36 +276,36 @@ EXPORT bool retro_unserialize(const void* data, size_t size)
 
 EXPORT bool retro_load_game(const struct retro_game_info* game)
 {
-	enum retro_pixel_format rgb565 = RETRO_PIXEL_FORMAT_RGB565;
+   enum retro_pixel_format rgb565 = RETRO_PIXEL_FORMAT_RGB565;
 
-	retro_reset();
-	
+   retro_reset();
+
    if (rawsamples)
       free(rawsamples);
-	
-	if (game->size < 44)
+
+   if (game->size < 44)
       return false;
 
-	memcpy(&head, game->data, 44);
+   memcpy(&head, game->data, 44);
 
-	if (game->size != 44 + head.Subchunk2Size)
+   if (game->size != 44 + head.Subchunk2Size)
       return false;
-	if (head.NumChannels   != 1 && head.NumChannels   != 2)
+   if (head.NumChannels   != 1 && head.NumChannels   != 2)
       return false;
-	if (head.BitsPerSample != 8 && head.BitsPerSample != 16)
+   if (head.BitsPerSample != 8 && head.BitsPerSample != 16)
       return false;
 
-	bytes_per_sample       = head.NumChannels   * head.BitsPerSample / 8;
-	samples_tot            = head.Subchunk2Size / bytes_per_sample;
-	
-	rawsamples             = malloc(head.Subchunk2Size);
+   bytes_per_sample       = head.NumChannels   * head.BitsPerSample / 8;
+   samples_tot            = head.Subchunk2Size / bytes_per_sample;
 
-	memcpy(rawsamples, (uint8_t*)game->data + 44, game->size - 44);
-	
-	if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb565))
+   rawsamples             = malloc(head.Subchunk2Size);
+
+   memcpy(rawsamples, (uint8_t*)game->data + 44, game->size - 44);
+
+   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb565))
       return false;
-	
-	return true;
+
+   return true;
 }
 
 EXPORT bool retro_load_game_special(unsigned game_type,
