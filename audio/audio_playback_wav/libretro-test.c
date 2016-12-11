@@ -194,8 +194,10 @@ EXPORT void retro_set_environment(retro_environment_t cb)
    environ_cb = cb;
    state      = ST_AUTO;
 
+#if 0
    if (environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &aud))
       state = ST_OFF;
+#endif
 }
 
 EXPORT void retro_deinit(void) {}
@@ -278,10 +280,8 @@ EXPORT bool retro_load_game(const struct retro_game_info* game)
 {
    enum retro_pixel_format rgb565 = RETRO_PIXEL_FORMAT_RGB565;
 
-   retro_reset();
-
-   if (rawsamples)
-      free(rawsamples);
+   sample_pos=0;
+   g_samples_to_play=0;
 
    if (game->size < 44)
       return false;
