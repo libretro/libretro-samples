@@ -7,4 +7,4 @@ Basic
 ## Building
 To compile, you will need FreeBasic installed.
 
-	fbc -dll fbastest.bas
+	fbc -dll fbastest.bas -x freebasic_libretro.so
