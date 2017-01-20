@@ -1,9 +1,9 @@
 ' 
 ' BUILDING
-'    Run "fbc -dll fbastest.bas"
+'    Run "fbc -dll fbastest.bas -x freebasic_libretro.so"
 '
 ' RUNNING
-'    ./retroarch -L libfbastest.so
+'    ./retroarch -L freebasic_libretro.so
 '
 #lang "fb"
 
