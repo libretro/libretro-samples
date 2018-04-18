@@ -97,6 +97,16 @@ else ifeq ($(platform), vita)
    AR = arm-vita-eabi-ar
    CFLAGS += -Wl,-q -O3
 	STATIC_LINKING = 1
+# Nintendo WiiU
+else ifeq ($(platform), wiiu)
+	TARGET := $(TARGET_NAME)_libretro_$(platform).a
+	CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
+	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
+	PLATFORM_DEFINES := -DGEKKO -DHW_RVL -DWIIU -mwup -mcpu=750 -meabi -mhard-float
+	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
+	ENDIANNESS_DEFINES += -DMSB_FIRST
+	STATIC_LINKING=1
+	EXTERNAL_ZLIB=1
 else
    CC = gcc
    TARGET := $(TARGET_NAME)_libretro.dll
@@ -126,17 +136,19 @@ else
 CFLAGS += -std=gnu99
 endif
 
+INCLUDES=-Ilibretro-common/include
+
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 ifeq ($(STATIC_LINKING), 1)
 	$(AR) rcs $@ $(OBJECTS)
 else
-	$(CC) $(fpic) $(SHARED) $(INCLUDES) -o $@ $(OBJECTS) $(LDFLAGS)
+	$(CC) $(fpic) $(SHARED) $(PLATFORM_DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LDFLAGS)
 endif
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(PLATFORM_DEFINES) $(INCLUDES) -c -o $@ $<
 
 clean:
 	rm -f $(OBJECTS) $(TARGET)
