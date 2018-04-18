@@ -29,7 +29,7 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
 	system_platform = win
 endif
 
-TARGET_NAME := buttontest
+TARGET_NAME := button_test
 LIBM		= -lm
 
 ifeq ($(ARCHFLAGS),)
