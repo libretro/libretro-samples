@@ -5,7 +5,7 @@ INCFLAGS       :=
 
 #Uncomment this to include the libretro-common include directory
 #INCFLAGS      += -I$(LIBRETRO_COMM_DIR)/include
-COREDEFINES    = -D__LIBRETRO__ -DFRONTEND_SUPPORTS_RGB565 
+COREDEFINES    = -D__LIBRETRO__
 
 INCLUDE_STDINT = 0
 ifneq (,$(findstring msvc2003,$(platform)))
