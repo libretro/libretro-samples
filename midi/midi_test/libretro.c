@@ -286,6 +286,9 @@ bool retro_load_game(const struct retro_game_info *p)
 {
    (void)p;
 
+   if (g_midi_iface == NULL)
+      return false;
+
    g_video_frame = (uint16_t *)calloc(sizeof(uint16_t) * WIDHT * HEIGHT, 1);
    g_midi_test   = MIDI_TEST_OFF;
 
