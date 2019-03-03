@@ -756,7 +756,7 @@ RETRO_API void retro_get_system_av_info(struct retro_system_av_info *info)
    info->geometry.aspect_ratio = (double)info->geometry.base_width / info->geometry.base_height;
    info->geometry.max_width = info->geometry.max_height = MAX(SCREEN_WIDTH, SCREEN_HEIGHT);
    info->timing.fps         = 60;
-   info->timing.sample_rate = 44100;
+   info->timing.sample_rate = 0.0;
 }
 
 RETRO_API unsigned retro_api_version(void) { return RETRO_API_VERSION; }

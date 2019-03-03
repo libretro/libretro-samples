@@ -190,7 +190,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    info->geometry.max_height   = HEIGHT;
    info->geometry.max_width    = WIDHT;
    info->timing.fps            = FPS;
-   info->timing.sample_rate    = 48000.0;
+   info->timing.sample_rate    = 0.0;
 }
 
 void retro_set_controller_port_device(unsigned p1, unsigned p2)
