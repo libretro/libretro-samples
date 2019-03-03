@@ -1,0 +1,2 @@
+TARGET_NAME = testgl_compute_shaders
+include_rules

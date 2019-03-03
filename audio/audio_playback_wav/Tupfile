@@ -1,0 +1,2 @@
+TARGET_NAME=testaudio_playback_wav
+include_rules

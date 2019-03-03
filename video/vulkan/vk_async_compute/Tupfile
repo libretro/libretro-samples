@@ -1,0 +1,2 @@
+TARGET_NAME=testvulkan_async_compute
+include_rules
