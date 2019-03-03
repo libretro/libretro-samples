@@ -204,7 +204,7 @@ class BoxesApp : public LibretroGLApplication
       void get_system_av_info(retro_system_av_info& info) const override
       {
          info.timing.fps = 60.0;
-         info.timing.sample_rate = 30000.0;
+         info.timing.sample_rate = 0.0;
          info.geometry.base_width = 320;
          info.geometry.base_height = 180;
          info.geometry.max_width = 1920;

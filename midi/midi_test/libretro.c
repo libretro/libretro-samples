@@ -190,7 +190,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    info->geometry.max_height   = HEIGHT;
    info->geometry.max_width    = WIDHT;
    info->timing.fps            = FPS;
-   info->timing.sample_rate    = 48000.0;
+   info->timing.sample_rate    = 0.0;
 }
 
 void retro_set_controller_port_device(unsigned p1, unsigned p2)
@@ -285,6 +285,9 @@ void retro_cheat_set(unsigned p1, bool p2, const char *p3)
 bool retro_load_game(const struct retro_game_info *p)
 {
    (void)p;
+
+   if (g_midi_iface == NULL)
+      return false;
 
    g_video_frame = (uint16_t *)calloc(sizeof(uint16_t) * WIDHT * HEIGHT, 1);
    g_midi_test   = MIDI_TEST_OFF;

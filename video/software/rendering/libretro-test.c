@@ -60,11 +60,10 @@ static retro_input_state_t input_state_cb;
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
    float aspect = 4.0f / 3.0f;
-   float sampling_rate = 30000.0f;
 
    info->timing = (struct retro_system_timing) {
       .fps = 60.0,
-      .sample_rate = sampling_rate,
+      .sample_rate = 0.0,
    };
 
    info->geometry = (struct retro_game_geometry) {

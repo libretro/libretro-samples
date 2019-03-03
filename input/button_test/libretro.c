@@ -174,7 +174,7 @@ void NETRETROPAD_CORE_PREFIX(retro_get_system_av_info)(
       struct retro_system_av_info *info)
 {
    info->timing.fps = 60.0;
-   info->timing.sample_rate = 30000.0;
+   info->timing.sample_rate = 0.0;
 
    info->geometry.base_width  = 320;
    info->geometry.base_height = 240;
