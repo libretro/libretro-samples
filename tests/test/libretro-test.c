@@ -1,3 +1,4 @@
+/* vim: set et sw=3 ts=3 sts=3: */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -13,6 +14,9 @@ static retro_log_printf_t log_cb;
 static bool use_audio_cb;
 static float last_aspect;
 static float last_sample_rate;
+static bool analog_mouse = true;
+static bool analog_mouse_relative = false;
+static bool enable_audio = true;
 
 static void fallback_log(enum retro_log_level level, const char *fmt, ...)
 {
@@ -103,9 +107,9 @@ void retro_set_environment(retro_environment_t cb)
    static const struct retro_variable vars[] = {
       { "test_aspect", "Aspect Ratio; 4:3|16:9" },
       { "test_samplerate", "Sample Rate; 30000|20000" },
-      { "test_opt0", "Test option #0; false|true" },
-      { "test_opt1", "Test option #1; 0" },
-      { "test_opt2", "Test option #2; 0|1|foo|3" },
+      { "test_analog_mouse", "Left Analog as mouse; true|false" },
+      { "test_analog_mouse_relative", "Analog mouse is relative; false|true" },
+      { "test_audio_enable", "Enable Audio; true|false" },
       { NULL, NULL },
    };
 
@@ -206,13 +210,40 @@ static void update_input(void)
    if (input_state_cb(0, RETRO_DEVICE_KEYBOARD, 0, RETROK_x))
       log_cb(RETRO_LOG_INFO, "x key is pressed!\n");
 
-   int16_t mouse_x = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_X);
-   int16_t mouse_y = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_Y);
+   int16_t mouse_x;
+   int16_t mouse_y;
+
    bool mouse_l    = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_LEFT);
    bool mouse_r    = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT);
    bool mouse_down = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_WHEELDOWN);
    bool mouse_up   = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_WHEELUP);
    bool mouse_middle = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_MIDDLE);
+
+   if (analog_mouse)
+   {
+      mouse_x = (320.0f / 32767.0f) * input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
+      mouse_y = (240.0f / 32767.0f) * input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
+
+      if (analog_mouse_relative)
+      {
+         mouse_x /= 32;
+         mouse_y /= 32;
+      }
+      else
+      {
+         mouse_x /= 2;
+         mouse_y /= 2;
+
+         mouse_x += 320 / 2;
+         mouse_y += 240 / 2;
+      }
+   }
+   else
+   {
+      mouse_x = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_X);
+      mouse_y = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_Y);
+   }
+
    if (mouse_x)
       log_cb(RETRO_LOG_INFO, "Mouse X: %d\n", mouse_x);
    if (mouse_y)
@@ -228,8 +259,17 @@ static void update_input(void)
    if (mouse_middle)
       log_cb(RETRO_LOG_INFO, "Mouse middle pressed.\n");
 
-   mouse_rel_x += mouse_x;
-   mouse_rel_y += mouse_y;
+   if ((analog_mouse && analog_mouse_relative) || !analog_mouse)
+   {
+      mouse_rel_x += mouse_x;
+      mouse_rel_y += mouse_y;
+   }
+   else
+   {
+      mouse_rel_x = mouse_x;
+      mouse_rel_y = mouse_y;
+   }
+
    if (mouse_rel_x >= 310)
       mouse_rel_x = 309;
    else if (mouse_rel_x < 10)
@@ -318,15 +358,30 @@ static void render_checkered(void)
 static void check_variables(void)
 {
    struct retro_variable var = {0};
-   var.key = "test_opt0";
+
+   var.key = "test_analog_mouse";
+
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      analog_mouse = !strcmp(var.value, "true") ? true : false;
       log_cb(RETRO_LOG_INFO, "Key -> Val: %s -> %s.\n", var.key, var.value);
-   var.key = "test_opt1";
+   }
+
+   var.key = "test_analog_mouse_relative";
+
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      analog_mouse_relative = !strcmp(var.value, "true") ? true : false;
       log_cb(RETRO_LOG_INFO, "Key -> Val: %s -> %s.\n", var.key, var.value);
-   var.key = "test_opt2";
+   }
+
+   var.key = "test_audio_enable";
+
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      enable_audio = !strcmp(var.value, "true") ? true : false;
       log_cb(RETRO_LOG_INFO, "Key -> Val: %s -> %s.\n", var.key, var.value);
+   }
 
    float last = last_aspect;
    float last_rate = last_sample_rate;
@@ -351,6 +406,9 @@ static void check_variables(void)
 
 static void audio_callback(void)
 {
+   if (!enable_audio)
+      return;
+
    for (unsigned i = 0; i < 30000 / 60; i++, phase++)
    {
       int16_t val = 0x800 * sinf(2.0f * M_PI * phase * 300.0f / 30000.0f);
