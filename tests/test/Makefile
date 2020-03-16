@@ -101,6 +101,43 @@ else ifeq ($(platform), vita)
    AR = arm-vita-eabi-ar
    CFLAGS += -Wl,-q -Wall -O3
 	STATIC_LINKING = 1
+# CTR (3DS)
+else ifeq ($(platform), ctr)
+	TARGET := $(TARGET_NAME)_libretro_$(platform).a
+	CC = $(DEVKITARM)/bin/arm-none-eabi-gcc$(EXE_EXT)
+	CXX = $(DEVKITARM)/bin/arm-none-eabi-g++$(EXE_EXT)
+	AR = $(DEVKITARM)/bin/arm-none-eabi-ar$(EXE_EXT)
+	CFLAGS += -D_3DS -DARM11 -march=armv6k -mtune=mpcore -mfloat-abi=hard
+	STATIC_LINKING = 1
+# Nintendo Switch (libnx)
+else ifeq ($(platform), libnx)
+    include $(DEVKITPRO)/libnx/switch_rules
+    EXT=a
+    TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+    DEFINES := -DSWITCH=1 -D__SWITCH__=1 -DHAVE_LIBNX=1
+    CFLAGS	:=	 $(DEFINES) -g -fPIE -I$(LIBNX)/include/ -I$(PORTLIBS)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec
+    CFLAGS += $(INCDIRS) -I$(CORE_DIR)/zlib -I$(CORE_DIR)/libogg/include -I$(CORE_DIR)/libvorbis/include \
+		-I$(CORE_DIR)/jpeg-8c -fvisibility=hidden
+    CFLAGS	+= -march=armv8-a -mtune=cortex-a57 -mtp=soft -mcpu=cortex-a57+crc+fp+simd -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+    STATIC_LINKING = 1
+else ifeq ($(platform), psp1)
+   TARGET := $(TARGET_NAME)_libretro_psp1.a
+   CC = psp-gcc
+   CXX = psp-g++
+   AR = psp-ar
+   CFLAGS += -DPSP -G0
+   CXXFLAGS += -DPSP -G0
+   DISABLE_ADLIB = 1
+   CFLAGS += -I$(shell psp-config --pspsdk-path)/include
+   STATIC_LINKING = 1
+else ifeq ($(platform), ps2)
+   TARGET := $(TARGET_NAME)_libretro_ps2.a
+   CC = ee-gcc
+   CXX = ee-g++
+   AR = ee-ar
+   CFLAGS += -DPS2 -G0 -D__sun
+   CXXFLAGS += -DPS2 -G0 -D__sun
+   STATIC_LINKING = 1
 else
    CC = gcc
    TARGET := $(TARGET_NAME)_libretro.dll
