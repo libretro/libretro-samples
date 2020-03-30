@@ -138,6 +138,14 @@ else ifeq ($(platform), ps2)
    CFLAGS += -DPS2 -G0 -D__sun
    CXXFLAGS += -DPS2 -G0 -D__sun
    STATIC_LINKING = 1
+else ifeq ($(platform), psl1ght)
+   EXT=a
+   TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+   CC = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
+   CXX = $(PS3DEV)/ppu/bin/ppu-g++$(EXE_EXT)
+   AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
+   CFLAGS += -D__ppc__ -DMSB_FIRST -D__CELLOS_LV2__ -D__PSL1GHT__ -I$(PSL1GHT)/ppu/include
+   STATIC_LINKING = 1
 else
    CC = gcc
    TARGET := $(TARGET_NAME)_libretro.dll
