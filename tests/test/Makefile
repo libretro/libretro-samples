@@ -144,7 +144,25 @@ else ifeq ($(platform), psl1ght)
    CC = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
    CXX = $(PS3DEV)/ppu/bin/ppu-g++$(EXE_EXT)
    AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
-   CFLAGS += -D__ppc__ -DMSB_FIRST -D__CELLOS_LV2__ -D__PSL1GHT__ -I$(PSL1GHT)/ppu/include
+   CFLAGS += -D__ppc__ -D__CELLOS_LV2__ -D__PSL1GHT__ -I$(PSL1GHT)/ppu/include
+   STATIC_LINKING = 1
+else ifneq (,$(filter $(platform), ngc wii wiiu))
+   TARGET := $(TARGET_NAME)_libretro_$(platform).a
+   CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
+   CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
+   AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
+   FLAGS += -DGEKKO -mcpu=750 -meabi -mhard-float -malign-natural 
+   FLAGS += -fsingle-precision-constant -mno-bit-align
+   FLAGS += -DHAVE_STRTOUL
+   ifneq (,$(findstring wiiu,$(platform)))
+      FLAGS += -DWIIU -DHW_RVL -mwup
+   else ifneq (,$(findstring wii,$(platform)))
+      FLAGS += -DHW_RVL -mrvl
+   else ifneq (,$(findstring ngc,$(platform)))
+      FLAGS += -DHW_DOL -mogc
+   endif
+   CFLAGS += $(FLAGS)
+   CXXFLAGS += $(FLAGS)  -fno-merge-constants 
    STATIC_LINKING = 1
 else
    CC = gcc
