@@ -24,7 +24,7 @@ jobs:
         echo "::set-output name=platform::$(echo ps2)"
         echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
 
-    - name: Compile project
+    - name: Compile test core
       run: |
         cd tests/test && make platform=${{ steps.core.outputs.platform }} clean all
 
