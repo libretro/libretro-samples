@@ -1,0 +1,1 @@
+SOURCES_C = $(CORE_DIR)/libretro-test.c
