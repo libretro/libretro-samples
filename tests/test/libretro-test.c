@@ -43,9 +43,83 @@ unsigned retro_api_version(void)
    return RETRO_API_VERSION;
 }
 
+static retro_video_refresh_t video_cb;
+static retro_audio_sample_t audio_cb;
+static retro_audio_sample_batch_t audio_batch_cb;
+static retro_environment_t environ_cb;
+static retro_input_poll_t input_poll_cb;
+static retro_input_state_t input_state_cb;
+
 void retro_set_controller_port_device(unsigned port, unsigned device)
 {
+   #define max_descriptions  10
+   static struct retro_input_descriptor empty_input_descriptor[] = { { 0 } };
+   struct retro_input_descriptor descriptions[max_descriptions+1] = {0}; /* set final record to nulls */
+   struct retro_input_descriptor *needle = &descriptions[0];
+
+   log_cb(RETRO_LOG_INFO, "Blanking existing controller descriptions.\n", device, port);
+   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, empty_input_descriptor); /* is this necessary? it was in the sample code */
+
    log_cb(RETRO_LOG_INFO, "Plugging device %u into port %u.\n", device, port);
+
+   switch(device)
+   {
+      case RETRO_DEVICE_NONE:
+        break;
+      case RETRO_DEVICE_LIGHTGUN:
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_LIGHTGUN_TRIGGER; needle->description = "Gun Trigger";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_LIGHTGUN_RELOAD; needle->description = "Gun Reload";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_LIGHTGUN_START; needle->description = "Gun Start";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_LIGHTGUN_SELECT; needle->description = "Gun Select";
+        needle++;
+        break;
+      case RETRO_DEVICE_JOYPAD: /* digital only controls */
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_UP; needle->description = "DPad Up";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_DOWN; needle->description = "DPad Down";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_LEFT; needle->description = "DPad Left";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_RIGHT; needle->description = "DPad Right";
+        needle++;
+      default: /*one of the digital+analog retropads */
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_UP; needle->description = "DPad Up";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_DOWN; needle->description = "DPad Down";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_LEFT; needle->description = "DPad Left";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_RIGHT; needle->description = "DPad Right";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_START; needle->description = "Digital Start";
+        needle++;
+        needle->port = port;  needle->device = RETRO_DEVICE_JOYPAD;  needle->index = 0;
+        needle->id = RETRO_DEVICE_ID_JOYPAD_SELECT; needle->description = "Digital Select";
+        needle++;
+        break;
+   }
+
+   /* construct final zeroed record */
+   needle->port = 0;  needle->device = 0;  needle->index = 0;
+   needle->id = 0;    needle->description = NULL;
+
+   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, descriptions);
 }
 
 void retro_get_system_info(struct retro_system_info *info)
@@ -56,13 +130,6 @@ void retro_get_system_info(struct retro_system_info *info)
    info->need_fullpath    = false;
    info->valid_extensions = NULL; // Anything is fine, we don't care.
 }
-
-static retro_video_refresh_t video_cb;
-static retro_audio_sample_t audio_cb;
-static retro_audio_sample_batch_t audio_batch_cb;
-static retro_environment_t environ_cb;
-static retro_input_poll_t input_poll_cb;
-static retro_input_state_t input_state_cb;
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
@@ -138,14 +205,20 @@ void retro_set_environment(retro_environment_t cb)
 
    cb(RETRO_ENVIRONMENT_SET_SUBSYSTEM_INFO, (void*)types);
 
+   #define DUMMY1     RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
+   #define DUMMY2     RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
+   #define RETRO_GUN  RETRO_DEVICE_LIGHTGUN
+   #define AUGMENTED  RETRO_DEVICE_JOYPAD
+
    static const struct retro_controller_description controllers[] = {
-      { "Dummy Controller #1", RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0) },
-      { "Dummy Controller #2", RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1) },
-      { "Augmented Joypad", RETRO_DEVICE_JOYPAD }, // Test overriding generic description in UI.
+      { "Dummy Controller #1", DUMMY1    },
+      { "Dummy Controller #2", DUMMY2    },
+      { "Lightgun",            RETRO_GUN },
+      { "Augmented Joypad",    AUGMENTED }, // Test overriding generic description in UI.
    };
 
    static const struct retro_controller_info ports[] = {
-      { controllers, 3 },
+      { controllers, 4 },
       { NULL, 0 },
    };
 
@@ -312,6 +385,21 @@ static void update_input(void)
       old_start = start;
       old_select = select;
    }
+
+   int16_t lightgun_x = 0;
+   int16_t lightgun_y = 0;
+   bool trigger_pressed = false;
+
+   lightgun_x      = input_state_cb(0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_X);
+   lightgun_y      = input_state_cb(0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_Y);
+   trigger_pressed = input_state_cb(0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_TRIGGER );
+
+   if (lightgun_x)
+      log_cb(RETRO_LOG_INFO, "Lightgun X: %d\n", mouse_x);
+   if (lightgun_y)
+      log_cb(RETRO_LOG_INFO, "Lightgun Y: %d\n", mouse_y);
+   if (trigger_pressed)
+      log_cb(RETRO_LOG_INFO, "Lightgun Trigger pressed.\n");
 }
 
 static void render_checkered(void)
