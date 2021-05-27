@@ -132,11 +132,11 @@ else ifeq ($(platform), psp1)
    STATIC_LINKING = 1
 else ifeq ($(platform), ps2)
    TARGET := $(TARGET_NAME)_libretro_ps2.a
-   CC = ee-gcc
-   CXX = ee-g++
-   AR = ee-ar
-   CFLAGS += -DPS2 -G0 -D__sun
-   CXXFLAGS += -DPS2 -G0 -D__sun
+   CC = mips64r5900el-ps2-elf-gcc
+   CXX = mips64r5900el-ps2-elf-g++
+   AR = mips64r5900el-ps2-elf-ar
+   CFLAGS += -DPS2 -G0
+   CXXFLAGS += -DPS2 -G0
    STATIC_LINKING = 1
 else ifeq ($(platform), psl1ght)
    EXT=a
