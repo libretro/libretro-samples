@@ -210,6 +210,8 @@ void retro_set_environment(retro_environment_t cb)
    #define RETRO_GUN  RETRO_DEVICE_LIGHTGUN
    #define AUGMENTED  RETRO_DEVICE_JOYPAD
 
+   #define NUMBER_OF_CONTROLS  2
+
    static const struct retro_controller_description controllers[] = {
       { "Dummy Controller #1", DUMMY1    },
       { "Dummy Controller #2", DUMMY2    },
@@ -218,6 +220,7 @@ void retro_set_environment(retro_environment_t cb)
    };
 
    static const struct retro_controller_info ports[] = {
+      { controllers, 4 },
       { controllers, 4 },
       { NULL, 0 },
    };
@@ -264,18 +267,12 @@ void retro_reset(void)
 
 static void update_input(void)
 {
+   int port = 0;
+
    int dir_x = 0;
    int dir_y = 0;
 
    input_poll_cb();
-   if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP))
-      dir_y--;
-   if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN))
-      dir_y++;
-   if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT))
-      dir_x--;
-   if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT))
-      dir_x++;
 
    if (input_state_cb(0, RETRO_DEVICE_KEYBOARD, 0, RETROK_RETURN))
       log_cb(RETRO_LOG_INFO, "Return key is pressed!\n");
@@ -283,123 +280,126 @@ static void update_input(void)
    if (input_state_cb(0, RETRO_DEVICE_KEYBOARD, 0, RETROK_x))
       log_cb(RETRO_LOG_INFO, "x key is pressed!\n");
 
-   int16_t mouse_x;
-   int16_t mouse_y;
-
-   bool mouse_l    = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_LEFT);
-   bool mouse_r    = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT);
-   bool mouse_down = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_WHEELDOWN);
-   bool mouse_up   = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_WHEELUP);
-   bool mouse_middle = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_MIDDLE);
-
-   if (analog_mouse)
+   for(port = 0; port < NUMBER_OF_CONTROLS; port++)
    {
-      mouse_x = (320.0f / 32767.0f) * input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
-      mouse_y = (240.0f / 32767.0f) * input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
+      if (input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP))
+         dir_y--;
+      if (input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN))
+         dir_y++;
+      if (input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT))
+         dir_x--;
+      if (input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT))
+         dir_x++;
 
-      if (analog_mouse_relative)
+      int16_t mouse_x;
+      int16_t mouse_y;
+
+      bool mouse_l      = input_state_cb(port, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_LEFT);
+      bool mouse_r      = input_state_cb(port, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT);
+      bool mouse_down   = input_state_cb(port, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_WHEELDOWN);
+      bool mouse_up     = input_state_cb(port, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_WHEELUP);
+      bool mouse_middle = input_state_cb(port, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_MIDDLE);
+
+      if (analog_mouse)
       {
-         mouse_x /= 32;
-         mouse_y /= 32;
+         mouse_x = (320.0f / 32767.0f) * input_state_cb(port, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
+         mouse_y = (240.0f / 32767.0f) * input_state_cb(port, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
+
+         if (analog_mouse_relative)
+         {
+            mouse_x /= 32;
+            mouse_y /= 32;
+         }
+         else
+         {
+            mouse_x /= 2;
+            mouse_y /= 2;
+
+            mouse_x += 320 / 2;
+            mouse_y += 240 / 2;
+         }
       }
       else
       {
-         mouse_x /= 2;
-         mouse_y /= 2;
-
-         mouse_x += 320 / 2;
-         mouse_y += 240 / 2;
+         mouse_x = input_state_cb(port, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_X);
+         mouse_y = input_state_cb(port, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_Y);
       }
-   }
-   else
-   {
-      mouse_x = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_X);
-      mouse_y = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_Y);
-   }
 
-   if (mouse_x)
-      log_cb(RETRO_LOG_INFO, "Mouse X: %d\n", mouse_x);
-   if (mouse_y)
-      log_cb(RETRO_LOG_INFO, "Mouse Y: %d\n", mouse_y);
-   if (mouse_l)
-      log_cb(RETRO_LOG_INFO, "Mouse L pressed.\n");
-   if (mouse_r)
-      log_cb(RETRO_LOG_INFO, "Mouse R pressed.\n");
-   if (mouse_down)
-      log_cb(RETRO_LOG_INFO, "Mouse wheeldown pressed.\n");
-   if (mouse_up)
-      log_cb(RETRO_LOG_INFO, "Mouse wheelup pressed.\n");
-   if (mouse_middle)
-      log_cb(RETRO_LOG_INFO, "Mouse middle pressed.\n");
+      if (mouse_l)
+         log_cb(RETRO_LOG_INFO, "Mouse #: %d     L pressed.   X: %d   Y: %d\n", port, mouse_x, mouse_y);
+      if (mouse_r)
+         log_cb(RETRO_LOG_INFO, "Mouse #: %d     R pressed.   X: %d   Y: %d\n", port, mouse_x, mouse_y);
+      if (mouse_down)
+         log_cb(RETRO_LOG_INFO, "Mouse #: %d     wheeldown pressed.   X: %d   Y: %d\n", port, mouse_x, mouse_y);
+      if (mouse_up)
+         log_cb(RETRO_LOG_INFO, "Mouse #: %d     wheelup pressed.     X: %d   Y: %d\n", port, mouse_x, mouse_y);
+      if (mouse_middle)
+         log_cb(RETRO_LOG_INFO, "Mouse #: %d     middle pressed.      X: %d   Y: %d\n", port, mouse_x, mouse_y);
 
-   if ((analog_mouse && analog_mouse_relative) || !analog_mouse)
-   {
-      mouse_rel_x += mouse_x;
-      mouse_rel_y += mouse_y;
-   }
-   else
-   {
-      mouse_rel_x = mouse_x;
-      mouse_rel_y = mouse_y;
-   }
+      if ((analog_mouse && analog_mouse_relative) || !analog_mouse)
+      {
+         mouse_rel_x += mouse_x;
+         mouse_rel_y += mouse_y;
+      }
+      else
+      {
+         mouse_rel_x = mouse_x;
+         mouse_rel_y = mouse_y;
+      }
 
-   if (mouse_rel_x >= 310)
-      mouse_rel_x = 309;
-   else if (mouse_rel_x < 10)
-      mouse_rel_x = 10;
-   if (mouse_rel_y >= 230)
-      mouse_rel_y = 229;
-   else if (mouse_rel_y < 10)
-      mouse_rel_y = 10;
+      if (mouse_rel_x >= 310)
+         mouse_rel_x = 309;
+      else if (mouse_rel_x < 10)
+         mouse_rel_x = 10;
+      if (mouse_rel_y >= 230)
+         mouse_rel_y = 229;
+      else if (mouse_rel_y < 10)
+         mouse_rel_y = 10;
 
-   bool pointer_pressed = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_PRESSED);
-   int16_t pointer_x = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
-   int16_t pointer_y = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
-   if (pointer_pressed)
-      log_cb(RETRO_LOG_INFO, "Pointer: (%6d, %6d).\n", pointer_x, pointer_y);
+      bool pointer_pressed = input_state_cb(port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_PRESSED);
+      int16_t pointer_x = input_state_cb(port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
+      int16_t pointer_y = input_state_cb(port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
+      if (pointer_pressed)
+         log_cb(RETRO_LOG_INFO, "Pointer Pressed #: %d    : (%6d, %6d).\n", port, pointer_x, pointer_y);
 
-   dir_x += input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X) / 5000;
-   dir_y += input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y) / 5000;
-   dir_x += input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X) / 5000;
-   dir_y += input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y) / 5000;
+      dir_x += input_state_cb(port, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X) / 5000;
+      dir_y += input_state_cb(port, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y) / 5000;
+      dir_x += input_state_cb(port, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X) / 5000;
+      dir_y += input_state_cb(port, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y) / 5000;
 
-   x_coord = (x_coord + dir_x) & 31;
-   y_coord = (y_coord + dir_y) & 31;
+      x_coord = (x_coord + dir_x) & 31;
+      y_coord = (y_coord + dir_y) & 31;
 
-   if (rumble.set_rumble_state)
-   {
-      static bool old_start;
-      static bool old_select;
-      uint16_t strength_strong = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ? 0x4000 : 0xffff;
-      uint16_t strength_weak = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2) ? 0x4000 : 0xffff;
-      bool start = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START);
-      bool select = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT);
-      if (old_start != start)
-         log_cb(RETRO_LOG_INFO, "Strong rumble: %s.\n", start ? "ON": "OFF");
-      rumble.set_rumble_state(0, RETRO_RUMBLE_STRONG, start * strength_strong);
+      if (rumble.set_rumble_state)
+      {
+         static bool old_start;
+         static bool old_select;
+         uint16_t strength_strong = input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ? 0x4000 : 0xffff;
+         uint16_t strength_weak = input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2) ? 0x4000 : 0xffff;
+         bool start = input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START);
+         bool select = input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT);
+         if (old_start != start)
+            log_cb(RETRO_LOG_INFO, "Port #: %d   Strong rumble: %s.\n", port, start ? "ON": "OFF");
+         rumble.set_rumble_state(port, RETRO_RUMBLE_STRONG, start * strength_strong);
 
-      if (old_select != select)
-         log_cb(RETRO_LOG_INFO, "Weak rumble: %s.\n", select ? "ON": "OFF");
-      rumble.set_rumble_state(0, RETRO_RUMBLE_WEAK, select * strength_weak);
+         if (old_select != select)
+            log_cb(RETRO_LOG_INFO, "Port #: %d   Weak rumble: %s.\n", port, select ? "ON": "OFF");
+         rumble.set_rumble_state(port, RETRO_RUMBLE_WEAK, select * strength_weak);
 
-      old_start = start;
-      old_select = select;
-   }
+         old_start = start;
+         old_select = select;
+      }
 
-   int16_t lightgun_x = 0;
-   int16_t lightgun_y = 0;
-   bool trigger_pressed = false;
+      int16_t lightgun_x = 0;
+      int16_t lightgun_y = 0;
+      bool trigger_pressed = false;
 
-   lightgun_x      = input_state_cb(0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_X);
-   lightgun_y      = input_state_cb(0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_Y);
-   trigger_pressed = input_state_cb(0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_TRIGGER );
+      lightgun_x      = input_state_cb(port, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_X);
+      lightgun_y      = input_state_cb(port, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_Y);
+      trigger_pressed = input_state_cb(port, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_TRIGGER );
 
-   if (lightgun_x)
-      log_cb(RETRO_LOG_INFO, "Lightgun X: %d\n", mouse_x);
-   if (lightgun_y)
-      log_cb(RETRO_LOG_INFO, "Lightgun Y: %d\n", mouse_y);
-   if (trigger_pressed)
-      log_cb(RETRO_LOG_INFO, "Lightgun Trigger pressed.\n");
+      if (trigger_pressed)
+         log_cb(RETRO_LOG_INFO, "Lightgun Trigger Pressed #: %d   Lightgun X: %d   Lightgun Y: %d\n", port, lightgun_x, lightgun_y);   }
 }
 
 static void render_checkered(void)
