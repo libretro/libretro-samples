@@ -146,6 +146,15 @@ else ifeq ($(platform), psl1ght)
    AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
    CFLAGS += -D__ppc__ -D__CELLOS_LV2__ -D__PSL1GHT__ -I$(PSL1GHT)/ppu/include
    STATIC_LINKING = 1
+else ifeq ($(platform), orbis)
+   TARGET := $(TARGET_NAME)_libretro_$(platform).a
+   CC = clang++
+   CXX = clang++
+   AR = orbis-ar
+   CFLAGS += -cc1 -triple x86_64-scei-ps4-elf -munwind-tables -mcmodel=large -Wno-zero-length-array -Wno-format-pedantic -emit-obj  -std=c11
+   CFLAGS += -I$(ORBISDEV)/usr/include -I$(ORBISDEV)/usr/include/c++/v1 -I$(ORBISDEV)/usr/include/orbis
+   CXXFLAGS += -cc1 -triple x86_64-scei-ps4-elf -munwind-tables -Wall -pedantic -m64 -mcmodel=large -Wno-zero-length-array -Wno-format-pedantic -emit-obj -std=c++11
+   STATIC_LINKING = 1
 else ifneq (,$(filter $(platform), ngc wii wiiu))
    TARGET := $(TARGET_NAME)_libretro_$(platform).a
    CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
@@ -199,7 +208,7 @@ else
 endif
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(fpic) -c -o $@ $<
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
 	rm -f $(OBJECTS) $(TARGET)
