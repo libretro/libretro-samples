@@ -152,7 +152,7 @@ else ifeq ($(platform), orbis)
    CXX = clang++
    AR = orbis-ar
    CFLAGS += --target=x86_64-scei-ps4 -DORBIS
-   CFLAGS += -I$(ORBISDEV)/usr/include -I$(ORBISDEV)/usr/include/c++/v1 -I$(ORBISDEV)/usr/include/orbis
+   CFLAGS += -isysroot $(ORBISDEV)
    STATIC_LINKING = 1
 else ifneq (,$(filter $(platform), ngc wii wiiu))
    TARGET := $(TARGET_NAME)_libretro_$(platform).a
