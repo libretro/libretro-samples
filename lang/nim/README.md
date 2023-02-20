@@ -10,7 +10,7 @@ Put your core-code in `src/example_libretro.nim` and you can run these:
 
 ```
 # build the libretro core
-nimble build
+nimble core
 ```
 
 You can run your core like this:
