@@ -3,13 +3,14 @@ author        = "David Konsumer"
 description   = "Example libretro core"
 license       = "MIT"
 srcDir        = "src"
+bin           = @["example_libretro"]
 
 requires "nim >= 1.6.10"
 
 import os
 
-task core, "Build your libretro core":
-  selfExec("c --outDir:. --app:lib --gc:none --passL:-fPIC src/example_libretro.nim")
+task core, "Build libretro core":
+  selfExec("c -d:release --app:lib --noMain --gc:orc --outDir=. src/example_libretro.nim")
 
 task clean, "Clean built files":
   for file in listFiles("."):

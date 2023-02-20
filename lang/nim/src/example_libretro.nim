@@ -14,8 +14,10 @@ var input_poll_cb: retro_input_poll_t
 var environ_cb: retro_environment_t
 var input_state_cb: retro_input_state_t
 
+proc NimMain() {.cdecl, importc.}
+
 # video framebuffer
-var buf = newSeq[cuint](WIDTH * HEIGHT)
+var buf:ptr UncheckedArray[cuint]
 
 # colors used for checkerboard
 const color_r:uint32 = 0xff shl 16
@@ -52,6 +54,9 @@ proc retro_set_input_state*(cb: retro_input_state_t) {.cdecl,exportc,dynlib.} =
   input_state_cb = cb
 
 proc retro_init*() {.cdecl,exportc,dynlib.} =
+  NimMain() 
+  var bufPtr0 = alloc0(sizeof(cuint) * WIDTH * HEIGHT)
+  buf = cast[ptr UncheckedArray[cuint]](bufPtr0)
   log_cb(RETRO_LOG_DEBUG, "retro_init() called.")
 
 proc retro_deinit*() {.cdecl,exportc,dynlib.} =
@@ -103,6 +108,7 @@ proc retro_load_game*(info: ptr retro_game_info): bool {.cdecl,exportc,dynlib.} 
 
 proc retro_unload_game*() {.cdecl,exportc,dynlib.} =
   log_cb(RETRO_LOG_DEBUG, "retro_unload_game() called.")
+  GC_FullCollect()
 
 proc retro_get_region*(): cuint {.cdecl,exportc,dynlib.} =
   return 0 # NTSC

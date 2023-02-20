@@ -9,8 +9,8 @@ Variable/type names are mostly the same as with a C core, with one exception:
 Put your core-code in `src/example_libretro.nim` and you can run these:
 
 ```
-# build the core
-nimble core
+# build the libretro core
+nimble build
 ```
 
 You can run your core like this:
@@ -25,4 +25,3 @@ retroarch -L libexample_libretro.so
 # windows
 retroarch -L libexample_libretro.dll
 ```
-
