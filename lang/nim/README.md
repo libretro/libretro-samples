@@ -4,6 +4,8 @@ Variable/type names are mostly the same as with a C core, with one exception:
 
 - Because nim disregards case in var-names, I had to rename keys like `RETROK_a` to `RETROK_LOWER_A`.
 
+For more in-depth info, check out [Pmunch's blog post](https://peterme.net/dynamic-libraries-in-nim.html) as it was very helpful in figuring out how to put it all together.
+
 ## Usage
 
 Put your core-code in `src/example_libretro.nim` and you can run these:
