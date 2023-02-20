@@ -61,6 +61,7 @@ proc retro_init*() {.cdecl,exportc,dynlib.} =
 
 proc retro_deinit*() {.cdecl,exportc,dynlib.} =
   log_cb(RETRO_LOG_DEBUG, "retro_deinit() called.")
+  dealloc(buf)
   GC_FullCollect()
 
 proc retro_api_version*(): cuint {.cdecl,exportc,dynlib.} =
