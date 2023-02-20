@@ -61,6 +61,7 @@ proc retro_init*() {.cdecl,exportc,dynlib.} =
 
 proc retro_deinit*() {.cdecl,exportc,dynlib.} =
   log_cb(RETRO_LOG_DEBUG, "retro_deinit() called.")
+  GC_FullCollect()
 
 proc retro_api_version*(): cuint {.cdecl,exportc,dynlib.} =
   return RETRO_API_VERSION
@@ -108,7 +109,6 @@ proc retro_load_game*(info: ptr retro_game_info): bool {.cdecl,exportc,dynlib.} 
 
 proc retro_unload_game*() {.cdecl,exportc,dynlib.} =
   log_cb(RETRO_LOG_DEBUG, "retro_unload_game() called.")
-  GC_FullCollect()
 
 proc retro_get_region*(): cuint {.cdecl,exportc,dynlib.} =
   return 0 # NTSC
