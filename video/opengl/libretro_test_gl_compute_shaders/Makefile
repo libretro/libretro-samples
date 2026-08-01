@@ -28,7 +28,10 @@ else ifeq ($(platform), osx)
    INCFLAGS += -I. -Igl
 else
    TARGET := $(TARGET_NAME)_libretro.dll
-   SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=link.T -Wl,--no-undefined
+   SHARED := -shared -static-libgcc -static-libstdc++ -Wl,--version-script=link.T -Wl,--no-undefined
+ ifneq ($(DEBUG), 1)
+   SHARED += -s
+   endif 
    GL_LIB := -lopengl32
    INCFLAGS += -I. -Igl -IGLcore
 endif
