@@ -184,6 +184,23 @@ static void clear_recording(void)
    playback_pos     = 0;
 }
 
+/*
+ * Releases the microphone. This deliberately does not go through set_mode():
+ * it runs while the core is being torn down, when pushing a message to the
+ * frontend is inappropriate, and close_mic() already stops capture, so there
+ * is no reason to touch the handle again first. Safe to call repeatedly.
+ */
+static void close_microphone(void)
+{
+   mode = MODE_IDLE;
+
+   if (!microphone)
+      return;
+
+   mic_interface.close_mic(microphone);
+   microphone = NULL;
+}
+
 /* ---- Rendering ---- */
 
 /* Maps a sample (-32768..32767) to a screen row, loudest at the edges. */
@@ -295,17 +312,18 @@ void retro_init(void)
 
 void retro_deinit(void)
 {
-   if (microphone)
-   {
-      mic_interface.close_mic(microphone);
-      microphone = NULL;
-   }
+   close_microphone();
 
    free(frame_buf);
    frame_buf = NULL;
 
    free(record_buffer);
    record_buffer = NULL;
+
+   /* Leave no state pointing at the buffers that were just freed */
+   record_write_pos = 0;
+   record_length    = 0;
+   playback_pos     = 0;
 }
 
 unsigned retro_api_version(void)
@@ -466,6 +484,10 @@ static void process_playback(void)
 
 void retro_run(void)
 {
+   /* Guards against a frontend that runs a frame while the core is shut down */
+   if (!frame_buf || !record_buffer)
+      return;
+
    handle_input();
    process_microphone();
    process_playback();
@@ -478,6 +500,12 @@ bool retro_load_game(const struct retro_game_info *info)
    retro_microphone_params_t params;
 
    (void)info;
+
+   if (!frame_buf || !record_buffer)
+   {
+      log_cb(RETRO_LOG_ERROR, "[audio_microphone] Out of memory.\n");
+      return false;
+   }
 
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
    {
@@ -519,13 +547,7 @@ bool retro_load_game(const struct retro_game_info *info)
 
 void retro_unload_game(void)
 {
-   set_mode(MODE_IDLE);
-
-   if (microphone)
-   {
-      mic_interface.close_mic(microphone);
-      microphone = NULL;
-   }
+   close_microphone();
 }
 
 unsigned retro_get_region(void)
