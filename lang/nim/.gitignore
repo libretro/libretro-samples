@@ -1,0 +1,8 @@
+nimcache/
+nimblecache/
+htmldocs/
+
+.DS_Store
+*.dylib
+*.so
+*.dll
