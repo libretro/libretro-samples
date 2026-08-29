@@ -8,9 +8,19 @@
 
 #include "libretro.h"
 
-static uint32_t *frame_buf;
+typedef struct core_data_t {
+    uint32_t *frame_buf;
+} core_data_t;
+
 static struct retro_log_callback logging;
 static retro_log_printf_t log_cb;
+static retro_video_refresh_t video_cb;
+static retro_audio_sample_t audio_cb;
+static retro_audio_sample_batch_t audio_batch_cb;
+static retro_environment_t environ_cb;
+static retro_input_poll_t input_poll_cb;
+static retro_input_state_t input_state_cb;
+
 static bool use_audio_cb;
 static float last_aspect;
 static float last_sample_rate;
@@ -29,26 +39,26 @@ static void fallback_log(enum retro_log_level level, const char *fmt, ...)
 
 void retro_init(void)
 {
-   frame_buf = calloc(320 * 240, sizeof(uint32_t));
+   core_data_t* core_data = calloc(1, sizeof(core_data_t));
+   core_data->frame_buf = calloc(320 * 240, sizeof(uint32_t));
+   environ_cb(RETRO_ENVIRONMENT_SET_CORE_DATA, (void*)core_data);
 }
 
 void retro_deinit(void)
 {
-   free(frame_buf);
-   frame_buf = NULL;
+   core_data_t* core_data = NULL;
+   environ_cb(RETRO_ENVIRONMENT_GET_CORE_DATA, &core_data);
+
+   if (core_data != NULL) {
+      free(core_data->frame_buf);
+      free(core_data);
+   }
 }
 
 unsigned retro_api_version(void)
 {
    return RETRO_API_VERSION;
 }
-
-static retro_video_refresh_t video_cb;
-static retro_audio_sample_t audio_cb;
-static retro_audio_sample_batch_t audio_batch_cb;
-static retro_environment_t environ_cb;
-static retro_input_poll_t input_poll_cb;
-static retro_input_state_t input_state_cb;
 
 void retro_set_controller_port_device(unsigned port, unsigned device)
 {
@@ -418,7 +428,9 @@ static void render_checkered(void)
    }
    else
    {
-      buf = frame_buf;
+      core_data_t* core_data = NULL;
+      environ_cb(RETRO_ENVIRONMENT_GET_CORE_DATA, &core_data);
+      buf = core_data->frame_buf;
       stride = 320;
    }
 
