@@ -163,7 +163,7 @@ else ifneq (,$(filter $(platform), ngc wii wiiu))
    FLAGS += -fsingle-precision-constant -mno-bit-align
    FLAGS += -DHAVE_STRTOUL
    ifneq (,$(findstring wiiu,$(platform)))
-      FLAGS += -DWIIU -DHW_RVL -mwup
+      FLAGS += -DWIIU -DHW_RVL -D__wiiu__
    else ifneq (,$(findstring wii,$(platform)))
       FLAGS += -DHW_RVL -mrvl
    else ifneq (,$(findstring ngc,$(platform)))
