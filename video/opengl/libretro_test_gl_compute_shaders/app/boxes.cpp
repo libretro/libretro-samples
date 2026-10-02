@@ -291,7 +291,7 @@ class BoxesApp : public LibretroGLApplication
       {
          player_view_deg_y += analog.rx * -120.0f * delta;
          player_view_deg_x += analog.ry * -90.0f * delta;
-         player_view_deg_x = clamp(player_view_deg_x, -80.0f, 80.0f);
+         player_view_deg_x = std::clamp(player_view_deg_x, -80.0f, 80.0f);
 
          mat4 rotate_x = rotate(mat4(1.0), player_view_deg_x, vec3(1, 0, 0));
          mat4 rotate_y = rotate(mat4(1.0), player_view_deg_y, vec3(0, 1, 0));
